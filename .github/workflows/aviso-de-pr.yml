@@ -1,0 +1,132 @@
+name: aviso-de-pr
+
+# Avisa a quien tiene que revisar, y le dice QUÉ mirar primero.
+#
+# POR QUÉ EXISTE. `CODEOWNERS` no auto-asigna revisor en repos privados con plan
+# Free (verificado 2026-08-07: PRs abiertos con el archivo ya correcto y las dos
+# personas listadas quedaron con `requested_reviewers` vacío). Una **@mención**,
+# en cambio, notifica SIEMPRE: no depende del plan, ni de que la persona siga el
+# repo, ni de que quien abre el PR se acuerde de pedir el review.
+#
+# PERO un ping pelado no agrega nada sobre el mail que ya manda el "watching".
+# El valor está en la segunda parte: marcar si el PR toca los archivos que
+# cambian el COMPORTAMIENTO del agente de la otra persona. Eso es lo que más
+# fácil se pasa por alto en un diff y lo único que hay que revisar sí o sí.
+#
+# Nunca falla el check: si algo sale mal, comenta lo que pudo y sale en verde.
+# Un aviso roto no debe bloquear un PR. Pero SÍ deja el motivo en el log — la
+# primera versión mandaba los errores a /dev/null y quedó imposible de
+# diagnosticar cuando la mención salió vacía. Fail-open, no fail-silent.
+
+on:
+  pull_request:
+    # Sin `synchronize` a propósito: cada push a la rama volvería a comentar.
+    types: [opened, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  avisar:
+    # Nunca desde un fork: un PR externo no debe poder hacer comentar al bot con
+    # el token del repo. Y los borradores no se avisan: todavía no se revisan.
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository
+      && github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comentar a quien revisa
+        env:
+          # Los valores entran por `env:` y NUNCA interpolados con la sintaxis de
+          # expresiones dentro del `run:`. Una expresión se sustituye como TEXTO
+          # antes de que corra el shell, así que un título de PR con comillas o
+          # con $(...) se ejecutaría. (Hardening estándar de Actions.)
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          AUTOR: ${{ github.event.pull_request.user.login }}
+          # Revisores ya pedidos: vienen en el payload del evento, sin costo de
+          # API y sin necesitar permisos extra.
+          PEDIDOS: ${{ join(github.event.pull_request.requested_reviewers.*.login, ' ') }}
+        run: |
+          set -uo pipefail
+
+          # ── A quién mencionar ──────────────────────────────────────────────
+          # Tres fuentes, de la más barata a la que puede fallar por permisos.
+          # Se unen y se deduplican; el autor nunca se menciona a sí mismo.
+          CANDIDATOS=""
+          FUENTE=""
+
+          # 1) Revisores ya pedidos (`gh pr create --reviewer ...`). Gratis.
+          if [ -n "${PEDIDOS:-}" ]; then
+            CANDIDATOS="$CANDIDATOS $PEDIDOS"
+            FUENTE="$FUENTE requested_reviewers"
+          fi
+
+          # 2) CODEOWNERS. En plan Free GitHub lo ignora, pero el archivo sigue
+          #    siendo el mapa declarado de quién revisa qué — acá por fin sirve
+          #    de algo. Se lee con `contents: read`, sin permisos especiales.
+          CO="$(gh api "repos/$REPO/contents/.github/CODEOWNERS" \
+                  -H "Accept: application/vnd.github.raw" 2>&1)" && {
+            HANDLES="$(printf '%s\n' "$CO" | sed 's/#.*//' | grep -oE '@[A-Za-z0-9-]+' | tr -d '@' | sort -u)"
+            if [ -n "$HANDLES" ]; then
+              CANDIDATOS="$CANDIDATOS $HANDLES"
+              FUENTE="$FUENTE codeowners"
+            fi
+          } || echo "::notice::sin CODEOWNERS legible ($CO)"
+
+          # 3) Colaboradores con permiso de escritura. Es la fuente ideal —se
+          #    mantiene sola si entra o sale gente— pero el GITHUB_TOKEN puede
+          #    no tener permiso para listarla. Si falla, queda dicho en el log.
+          COLS="$(gh api "repos/$REPO/collaborators" --paginate \
+                    --jq '.[] | select(.permissions.push == true) | .login' 2>&1)" && {
+            CANDIDATOS="$CANDIDATOS $COLS"
+            FUENTE="$FUENTE collaborators"
+          } || echo "::notice::no se pudo listar collaborators con el token del workflow ($COLS)"
+
+          # Normalizar: uno por línea, sin el autor, sin bots, sin repetidos.
+          OTROS="$(printf '%s\n' $CANDIDATOS \
+                   | grep -vE '^$' \
+                   | grep -Fvx "$AUTOR" \
+                   | grep -vE '\[bot\]$' \
+                   | sort -u || true)"
+
+          MENCION=""
+          for u in $OTROS; do MENCION="$MENCION @$u"; done
+          MENCION="${MENCION# }"
+          echo "::notice::menciones=[${MENCION}] fuentes=[${FUENTE# }]"
+
+          # ── Qué tocó, de lo que cambia el comportamiento de los agentes ────
+          ARCHIVOS="$(gh pr diff "$PR" --repo "$REPO" --name-only 2>&1)" || {
+            echo "::notice::no se pudo leer el diff ($ARCHIVOS)"; ARCHIVOS=""
+          }
+          # Solo lo que cambia el COMPORTAMIENTO de los agentes: hooks, config,
+          # guardas, instaladores. La documentación queda afuera a propósito —
+          # una advertencia que salta por un changelog se aprende a ignorar.
+          LEY="$(printf '%s\n' "$ARCHIVOS" \
+                 | grep -E '^(\.claude/|\.githooks/|\.github/|baseline-seguridad/|AGENTS\.md|CLAUDE\.md|vault\.conf|vault-manifest\.json|install\.sh|update\.sh|personalize\.sh)' \
+                 || true)"
+
+          {
+            if [ -n "$MENCION" ]; then
+              echo "$MENCION — este PR te toca revisar."
+            else
+              echo "PR listo para revisar."
+            fi
+            echo ""
+            if [ -n "$LEY" ]; then
+              echo "> [!WARNING]"
+              echo "> **Toca archivos que cambian cómo trabaja tu agente.** Empezá por acá: un cambio en estas rutas te modifica el comportamiento **en tu propia máquina**, sin que lo hayas pedido."
+              echo ">"
+              printf '%s\n' "$LEY" | sed 's/^/> - `/; s/$/`/'
+              echo ""
+            fi
+            echo "Para revisar: \`gh pr diff $PR\` — o la extensión *GitHub Pull Requests* en el editor."
+            echo ""
+            echo "<sub>Aviso automático. Existe porque \`CODEOWNERS\` no asigna revisor en repos privados con plan Free, así que el check verde no obliga a nada y la revisión es de una persona. Nadie aprueba su propio PR, ni el que escribió su agente.</sub>"
+          } > /tmp/cuerpo-aviso.md
+
+          gh pr comment "$PR" --repo "$REPO" --body-file /tmp/cuerpo-aviso.md \
+            || echo "::warning::no se pudo comentar en el PR"
+          exit 0

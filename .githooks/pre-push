@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+# Git hook pre-push (versionado en .githooks/, activado con core.hooksPath).
+#
+# Equivalente AGNÓSTICO de la regla FORCE_PUSH de security-guard.py: aquella
+# corre en PreToolUse y solo protege a Claude Code; esta corre en CADA
+# `git push`, lo haga un agente o un humano, desde el harness que sea.
+# Ver el README, sección Git.
+#
+# Qué bloquea: el push NO fast-forward — que es lo que `--force` de verdad hace.
+# Un `--force` que resulta fast-forward es inofensivo y no se marca; un push sin
+# `--force` nunca es non-fast-forward (git ya lo rechaza). Se detecta el efecto,
+# no la bandera, así que no hay forma de esquivarlo escribiendo el flag distinto.
+#
+# También avisa (sin bloquear) al borrar una rama remota.
+#
+# Escape: ALLOW_FORCE_PUSH=1 git push --force-with-lease ...
+# Kill-switch: .vault-meta/prepush.disabled
+# FAIL-OPEN: si no se puede determinar la relación entre los commits, permite.
+#
+# Protocolo del hook: por stdin llegan líneas
+#   <ref local> <sha local> <ref remota> <sha remoto>
+set -uo pipefail
+
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")"
+[ -f "$ROOT/.vault-meta/prepush.disabled" ] && exit 0
+
+# ── Guard: NO pushear un vault PERSONALIZADO al repo del TEMPLATE ──
+# Al clonar el template directamente (en vez de forkear), origin queda apuntando al
+# template; un push publicaría tu nombre/email (en ~110 archivos) en el repo público.
+# Se bloquea si el destino es el template Y este clon ya fue personalizado (existe
+# owner.env). El mantenedor del template pushea desde un checkout SIN owner.env, así
+# que nunca queda bloqueado. git pasa <remote-name> <remote-url> como $1 $2.
+# El nombre del repo va hardcodeado acá: si el template se renombra, ESTA línea
+# es la que hay que tocar. Matchea los dos nombres que tuvo — `sistema-maestro-pro`
+# (el template real desde el rename del 2026-08-21) y el viejo
+# `sistema-maestro-template` — para cubrir clones con el remoto sin actualizar.
+if [ "${ALLOW_TEMPLATE_PUSH:-0}" != "1" ] && [ -f "$ROOT/owner.env" ] \
+   && printf '%s' "${2:-}" | grep -qE 'sistema-maestro-(pro|template)'; then
+  cat >&2 <<'EOF'
+pre-push: ⛔ estás por pushear un vault PERSONALIZADO al repo del TEMPLATE.
+
+Publicaría tu nombre/email (en ~110 archivos) en el repo del template. Casi seguro
+clonaste el template directamente en vez de forkear. Re-apuntá origin a TU repo:
+    git remote set-url origin https://github.com/<vos>/<tu-vault>.git
+
+Si de verdad sos el mantenedor y querés publicar en el template:
+    ALLOW_TEMPLATE_PUSH=1 git push ...
+EOF
+  exit 1
+fi
+
+[ "${ALLOW_FORCE_PUSH:-0}" = "1" ] && exit 0
+
+ZERO='0000000000000000000000000000000000000000'
+blocked=0
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  [ -z "${remote_ref:-}" ] && continue
+
+  # Borrado de rama remota: se avisa, no se bloquea (a veces es limpieza legítima).
+  case "$local_sha" in
+    "$ZERO"|"") echo "pre-push: ⚠ estás BORRANDO la rama remota $remote_ref." >&2
+                continue ;;
+  esac
+
+  # Rama nueva en el remoto: no hay historia que reescribir.
+  case "$remote_sha" in "$ZERO"|"") continue ;; esac
+
+  # Si no tenemos el objeto remoto localmente no se puede decidir → permitir.
+  git cat-file -e "${remote_sha}^{commit}" 2>/dev/null || continue
+
+  # Fast-forward = el commit remoto es ancestro del que empujamos.
+  if ! git merge-base --is-ancestor "$remote_sha" "$local_sha" 2>/dev/null; then
+    echo "pre-push: ✗ push NO fast-forward a $remote_ref — reescribiría historia publicada." >&2
+    blocked=1
+  fi
+done
+
+if [ "$blocked" -eq 1 ]; then
+  cat >&2 <<'EOF'
+
+Reescribir historia remota es destructivo: en multi-device o en vault compartido
+puede borrar trabajo de otro. Ver el README, sección Git.
+
+Si es deliberado y sabés lo que estás haciendo:
+    ALLOW_FORCE_PUSH=1 git push --force-with-lease
+(preferí siempre --force-with-lease sobre --force).
+EOF
+  exit 1
+fi
+exit 0

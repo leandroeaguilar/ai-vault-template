@@ -1,0 +1,113 @@
+# Verificación en cada PR — el mismo gate que corre en tu máquina,
+# pero del lado del servidor.
+#
+# Por qué existe: los hooks de .githooks/ solo corren en el clon de quien commitea,
+# y solo si esa persona corrió ./install.sh. En un repo compartido eso no es una
+# garantía, es una esperanza. Acá el chequeo no depende de la máquina de nadie.
+#
+# Qué bloquea y qué no (deliberado):
+#   secret-scan   → BLOQUEA. Un secreto en una rama publicada ya se filtró.
+#   sentinels     → BLOQUEA. Los bloques <!-- @user --> son propiedad humana; que
+#                   un PR los altere no se negocia. Es el equivalente agnóstico
+#                   del guard PreToolUse, que solo protege a Claude Code.
+#   verify-commit → avisa. La regla "no retroactivo" del sistema dice que el
+#                   frontmatter se normaliza al tocar, no de golpe. Para
+#                   bloquear: poné VERIFIER_STRICT en "1" más abajo.
+#   check-links   → informa. Los enlaces rotos incluyen promesas [[wikilink]]
+#                   intencionales; bloquear por eso sería ruido.
+#   índices       → informa. Los index.md son generados; si el diff no da cero,
+#                   alguien commiteó sin el hook.
+
+name: verify
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      # Poné "1" para que el frontmatter incompleto BLOQUEE el PR.
+      VERIFIER_STRICT: "0"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # los verificadores comparan contra la base del PR
+
+      - name: Rango del PR
+        id: range
+        env:
+          # Por `env:` y no interpolado en el script: hardening estándar de Actions.
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          # OJO con `[ cond ] && x=y`: los `run:` corren con `bash -eo pipefail`,
+          # así que cuando la condición es FALSA la lista devuelve 1 y el paso
+          # falla — justo en el caso normal. Va con if/then, no con `&&`.
+          BASE="$PR_BASE"; HEAD="$PR_HEAD"
+          # workflow_dispatch: sin payload de PR, se verifica el último commit.
+          if [ -z "$BASE" ]; then BASE="$(git rev-parse HEAD~1 2>/dev/null || git rev-parse HEAD)"; fi
+          if [ -z "$HEAD" ]; then HEAD="$(git rev-parse HEAD)"; fi
+          echo "base=$BASE" >> "$GITHUB_OUTPUT"
+          echo "head=$HEAD" >> "$GITHUB_OUTPUT"
+          echo "Verificando $BASE...$HEAD"
+
+      # ── BLOQUEANTE ───────────────────────────────────────────────────────────
+      - name: Secretos (bloquea)
+        env:
+          BASE: ${{ steps.range.outputs.base }}
+          HEAD: ${{ steps.range.outputs.head }}
+        run: bash .claude/hooks/secret-scan.sh --range "$BASE" "$HEAD"
+
+      - name: Centinelas @user (bloquea)
+        env:
+          BASE: ${{ steps.range.outputs.base }}
+          HEAD: ${{ steps.range.outputs.head }}
+        run: python3 .claude/hooks/sentinels-verify.py --range "$BASE" "$HEAD"
+
+      # ── AVISO (bloquea solo con VERIFIER_STRICT=1) ───────────────────────────
+      - name: Frontmatter y tags
+        env:
+          BASE: ${{ steps.range.outputs.base }}
+          HEAD: ${{ steps.range.outputs.head }}
+        run: |
+          # Se captura el código de salida a mano para que el resumen se escriba
+          # SIEMPRE, también cuando VERIFIER_STRICT=1 hace fallar el paso.
+          rc=0
+          bash .claude/hooks/verify-commit.sh --range "$BASE" "$HEAD" > /tmp/verify.txt 2>&1 || rc=$?
+          cat /tmp/verify.txt
+          {
+            echo "### Frontmatter"
+            echo '```'
+            cat /tmp/verify.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit $rc
+
+      # ── INFORMATIVOS ─────────────────────────────────────────────────────────
+      - name: Enlaces
+        continue-on-error: true
+        run: |
+          bash .claude/hooks/check-links.sh | tail -1 | tee /tmp/links.txt
+          echo "### Enlaces" >> "$GITHUB_STEP_SUMMARY"
+          sed 's/^/- /' /tmp/links.txt >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Índices generados al día
+        continue-on-error: true
+        run: |
+          python3 .claude/hooks/generate-index.py >/dev/null 2>&1 || true
+          if git diff --quiet -- '*index.md'; then
+            echo "- índices al día (regenerar = 0 diff)" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "### Índices desactualizados" >> "$GITHUB_STEP_SUMMARY"
+            echo "Alguien commiteó sin el hook pre-commit. Corré \`./install.sh\` y regenerá:" >> "$GITHUB_STEP_SUMMARY"
+            git diff --name-only -- '*index.md' | sed 's/^/- /' >> "$GITHUB_STEP_SUMMARY"
+          fi

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Git hook pre-commit del baseline de seguridad.
+# Instalar: copiar a .githooks/pre-commit del proyecto + `git config core.hooksPath .githooks`.
+# Bloquea el commit si hay secretos staged (antes de que entren al historial).
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")"
+exec bash "$ROOT/.claude/hooks/secret-scan.sh"

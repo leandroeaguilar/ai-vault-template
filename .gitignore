@@ -1,0 +1,19 @@
+# Estado local de los hooks: marcas de sesión, locks, stamps y kill-switches.
+# Es estado de UNA máquina. Versionarlo haría que el kill-switch de alguien
+# apagara la guarda de todos los demás.
+.vault-meta/
+
+# Identidad de quien instala el toolkit (la crea a partir del .example).
+# Nunca se versiona: es lo único que distingue tu copia de la de cualquier otro.
+owner.env
+
+# Secretos — redundante con la guarda, y esa es exactamente la idea: si el hook
+# falla o alguien lo apaga, esto sigue en pie.
+.env
+.env.*
+*.pem
+id_rsa*
+credentials.json
+
+__pycache__/
+*.pyc

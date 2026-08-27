@@ -1,0 +1,28 @@
+# Los hooks del harness son bash: DEBEN conservar LF siempre.
+# Con CRLF, el shebang y `\r` finales rompen la ejecución en Git Bash (Windows).
+*.sh text eol=lf
+.claude/hooks/* text eol=lf
+.githooks/* text eol=lf
+
+# ── Archivos append-only: unión en vez de conflicto ──────────────────────────
+# `merge=union` conserva las líneas de AMBOS lados en lugar de marcar conflicto.
+# Sirve solo donde cada línea es un registro independiente que se agrega al final:
+# la bitácora de agentes (una entrada por sesión) y el changelog del sistema.
+# Sin esto, dos agentes/personas que registran su handoff en paralelo chocan
+# SIEMPRE en la última línea del archivo. Patrón validado (GitLab lo usa para su
+# changelog desde 2015).
+#
+# ⚠️ Dos límites reales:
+#   1. Union NO ordena: si dos entradas se agregan a la vez, pueden quedar
+#      intercaladas. Revisar el orden cronológico después de un merge conflictivo.
+#   2. La UI web de GitHub NO honra merge=union al resolver conflictos en el
+#      navegador. Funciona en merges locales (`git merge`, `git pull`).
+#
+# NO extender esta regla a notas de conocimiento: ahí unir ambos lados produce
+# texto incoherente, y el conflicto explícito es la conducta correcta.
+#
+# ⚠️ Sintaxis: .gitattributes NO admite espacios en los patrones (git parte la
+# línea por whitespace; no hay comillas ni escapes). Como este vault tiene
+# carpetas con espacio, se usa `?` — comodín de un carácter — en su lugar.
+05?Diario/Bitácora?Agentes/*.md merge=union
+00?Sistema/CHANGELOG?del?Sistema.md merge=union
