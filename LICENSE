@@ -1,3 +1,24 @@
+Sistema Maestro Toolkit — licencias
+===================================
+
+Este repositorio tiene DOS licencias según el tipo de archivo.
+
+1) CÓDIGO Y CONFIGURACIÓN — MIT (texto completo más abajo).
+   Alcance: *.sh, *.py, *.yml, .claude/**, .githooks/**, .github/**,
+   baseline-seguridad/** (salvo su README.md), vault-manifest.json, vault.conf,
+   .gitattributes, .gitignore, VERSION.
+
+2) CONTENIDO — CC BY-NC-SA 4.0, ver el archivo LICENSE-CONTENT de este mismo
+   repositorio.
+   Alcance: todo lo demás. En particular los archivos *.md (SOPs, plantillas,
+   documentación, README) y la arquitectura de carpetas del vault.
+
+En caso de duda sobre un archivo, rige CC BY-NC-SA 4.0.
+
+Copyright (c) 2026 Leandro Esteban Aguilar Montilla
+
+-------------------------------------------------------------------------------
+
 MIT License
 
 Copyright (c) 2026 Leandro Esteban Aguilar Montilla

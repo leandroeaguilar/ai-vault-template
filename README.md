@@ -6,9 +6,10 @@ que corre en cada commit y en cada PR, y un actualizador por whitelist para dist
 template sin pisar el contenido de nadie.
 
 Es la capa de ingeniería de un sistema personal más grande (un vault de Obsidian que sigue
-siendo privado). Acá está **lo que corre**, no el método: ningún SOP, ninguna nota, ninguna
-plantilla de contenido. 44 archivos, 280 KB, sin dependencias más allá de `bash`, `git` y
-`python3`.
+siendo privado). Acá está **lo que corre y lo que especifica lo que corre**: los hooks, más
+las tres carpetas de contrato que esos hooks aplican. El método —los SOPs de cómo se estudia,
+se decide y se revisa— no está. 62 archivos, 365 KB, sin dependencias más allá de `bash`,
+`git` y `python3`.
 
 > **Por qué está publicado:** porque el código que guarda un sistema se puede leer y probar
 > en dos minutos, y el método no. Si querés evaluar el criterio detrás de esto, empezá por
@@ -146,6 +147,32 @@ ignorar, y ahí perdés las dos.
 
 ---
 
+## El vault mínimo
+
+Las ocho carpetas (`00 Sistema` … `99 Archivo`) no son decoración: **ocho de los hooks las
+hardcodean**. `agent-diary.sh` escribe en `05 Diario/Bitácora Agentes/`, `check-links.sh`
+escanea `00 Sistema`, `verify-commit.sh` y `sentinels-verify.py` miran `04 Knowledge`. Sin
+ellas el repo se clona y los hooks no tienen sobre qué correr.
+
+Junto con las carpetas viaja lo mínimo para que el verifier tenga sentido:
+
+| Qué | Por qué está |
+|---|---|
+| [`SOP Documentación`](<00 Sistema/SOP Documentación.md>) | El contrato que aplican `verify-commit.sh`, `harden-links.py` y `generate-index.py`: frontmatter canónico, naming, esquema de `id`, regla de enlaces |
+| [`Centinelas de Edición`](<00 Sistema/Centinelas de Edición.md>) | La spec de `sentinels-guard.*` y `sentinels-verify.py` |
+| [`SOP Hooks y Automatización`](<00 Sistema/SOP Hooks y Automatización.md>) | Cómo se escribe, se cablea y se apaga un hook; los locks advisory |
+| 3 plantillas | El frontmatter que el verifier exige, en un archivo que se puede copiar |
+| [`AGENTS.md`](<AGENTS.md>) | El contrato que lee cualquier agente antes de escribir |
+
+**Publicar un validador sin su esquema no sirve de nada**, y así estuvo este repo en su
+primera versión: los hooks aplicaban un contrato que vivía en un archivo privado.
+
+Los `.md` de esta capa asumen **Obsidian + Templater** (las plantillas traen
+`<% tp.date.now() %>`). Es la única dependencia más allá de `bash`, `git` y `python3`, y es
+opcional: los hooks corren igual.
+
+---
+
 ## El actualizador por whitelist
 
 `update.sh` + `vault-manifest.json` son la parte que más cuesta hacer bien: distribuir
@@ -163,10 +190,11 @@ conflictos en archivos que la persona nunca quiso tocar. La whitelist declara tr
 `update.sh` copia por `diff`/`checkout`, no mergea — por eso no necesita historia compartida
 con el upstream.
 
-> Estos dos archivos van **tal cual se usan** en el sistema privado: su lista de archivos
-> nombra piezas que no están en este repo (`setup.sh`, `team-mode.sh`, `00 Inicio Rapido.md`).
-> Se publican como implementación de referencia, no recortados para que parezcan hechos a
-> medida. Adaptá la lista a tu repo.
+> La whitelist de `update.sh` y la de `vault-manifest.json` **tienen que decir lo mismo, y
+> toda ruta que nombran tiene que existir**. Es fácil que se desincronicen —agregás un archivo
+> al manifest y te olvidás del script— y el modo de falla es silencioso: el updater simplemente
+> no copia ese archivo, sin decir nada. Un `for` sobre las entradas verificando `os.path.exists`
+> cuesta un segundo y va en la verificación previa al commit.
 
 ---
 
@@ -207,8 +235,9 @@ Linux, el otro devolvía `exit=0` porque buscaba un nombre que había cambiado.
 
 ## Supuestos
 
-Algunos hooks asumen la estructura del vault del que salieron. Se publican así a propósito:
-un hook honesto sobre sus supuestos es mejor evidencia que uno genérico a medias.
+Algunos hooks asumen la estructura del vault del que salieron, y **esa estructura viene en el
+repo** (ver *El vault mínimo*). Se publican sin generalizar, a propósito: un hook honesto sobre
+sus supuestos es mejor evidencia que uno genérico a medias.
 
 | Hook | Asume |
 |---|---|
@@ -223,12 +252,25 @@ Todo se apaga por archivo: `.vault-meta/<nombre>.disabled`.
 
 ## Qué NO está acá
 
-Los SOPs, las plantillas de contenido, la arquitectura de carpetas, las skills y la
-documentación del método. Eso es un sistema privado y no se publica. Este repo es la
-maquinaria, no el manual.
+Los 26 SOPs de método —cómo se estudia, se decide, se revisa, se construye carrera—, las 11
+plantillas restantes, las skills, los MOCs y el `CLAUDE.md` con la taxonomía completa. Eso es
+un sistema privado y no se publica.
+
+La línea de corte: **entra lo que ejecuta, y lo que especifica lo que ejecuta.** `SOP
+Documentación` entra porque el verifier lo aplica en cada commit; un SOP sobre cómo escribir
+notas atómicas no, porque ningún hook lo aplica. Este repo es la maquinaria y su contrato, no el manual del
+sistema.
 
 ---
 
 ## Licencia
 
-[MIT](LICENSE) © 2026 Leandro Esteban Aguilar Montilla.
+Doble, según el tipo de archivo:
+
+- **Código y configuración** (`*.sh`, `*.py`, `*.yml`, `.claude/**`, `.githooks/**`,
+  `.github/**`, `vault-manifest.json`) — [MIT](LICENSE).
+- **Contenido** (`*.md`: SOPs, plantillas, este README, y la arquitectura de carpetas) —
+  [CC BY-NC-SA 4.0](LICENSE-CONTENT).
+
+En caso de duda sobre un archivo, rige CC BY-NC-SA 4.0. © 2026 Leandro Esteban Aguilar
+Montilla.

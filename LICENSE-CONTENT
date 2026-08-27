@@ -1,0 +1,48 @@
+Sistema Maestro Toolkit — licencia del contenido
+================================================
+
+El CONTENIDO de este repositorio se publica bajo:
+
+  Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional
+  (CC BY-NC-SA 4.0)
+
+  Copyright (c) 2026 Leandro Esteban Aguilar Montilla
+
+  Resumen legible:  https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es
+  Texto legal:      https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode.es
+
+QUÉ CUBRE
+---------
+Todos los archivos *.md (SOPs, plantillas, documentación, README) y la
+arquitectura de carpetas del vault.
+
+NO cubre el código ejecutable ni la configuración (*.sh, *.py, *.yml,
+.claude/**, .githooks/**, .github/**, vault-manifest.json, vault.conf,
+.gitattributes, .gitignore, VERSION): eso va bajo licencia MIT. Ver el archivo
+LICENSE.
+
+PODÉS
+-----
+  · Compartir — copiar y redistribuir el material en cualquier medio o formato.
+  · Adaptar — remezclar, transformar y construir a partir del material.
+
+BAJO ESTAS CONDICIONES
+----------------------
+  · Atribución — dar crédito de manera adecuada, con un enlace a la licencia
+    e indicando si se hicieron cambios.
+
+  · NoComercial — no se puede usar el material con fines comerciales. Esto
+    incluye, sin limitarse a: revenderlo, distribuirlo como producto propio,
+    incorporarlo a una oferta paga, o usarlo como base de un servicio pago.
+
+  · CompartirIgual — si se remezcla, transforma o construye a partir del
+    material, hay que distribuir la contribución bajo la misma licencia que
+    el original.
+
+  · Sin restricciones adicionales — no se pueden aplicar términos legales ni
+    medidas tecnológicas que restrinjan legalmente lo que la licencia permite.
+
+USO COMERCIAL
+-------------
+El uso comercial requiere autorización expresa por escrito del titular del
+copyright. Contacto: https://github.com/leandroeaguilar

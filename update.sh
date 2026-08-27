@@ -10,23 +10,17 @@ REMOTE="upstream"; BRANCH="main"
 
 # Whitelist de framework (sincronizada con vault-manifest.json → infrastructure)
 FRAMEWORK_PATHS=(
-  ".claude" ".githooks" ".gitattributes" ".gitignore" ".obsidian"
-  "00 Sistema"
-  "04 Knowledge/Skills" "04 Knowledge/Automatización" "04 Knowledge/Sistemas y Metodologías"
-  "04 Knowledge/Investigación del Sistema"
-  "01 Index/Principios.md" "01 Index/Valores.md"
-  "02 MOCs/MOC - Investigación del Sistema.md"
-  "04 Knowledge/Temas/Prompt Injection y la Tríada Letal.md"
-  "04 Knowledge/Temas/Cadena de Suministro y Código de Terceros.md"
-  "02 MOCs/MOC - Seguridad.md"
+  ".claude" ".githooks" ".gitattributes" ".gitignore"
+  ".github/workflows/verify.yml" ".github/workflows/aviso-de-pr.yml"
+  "00 Sistema" "baseline-seguridad"
+  "01 Index/.gitkeep" "02 MOCs/.gitkeep" "03 Proyectos/.gitkeep"
+  "04 Knowledge/.gitkeep" "06 Raw/.gitkeep" "99 Archivo/.gitkeep"
   "05 Diario/Bitácora Agentes/_Acerca de esta bitácora.md"
-  "03 Proyectos/.gitkeep" "06 Raw/.gitkeep" "99 Archivo/.gitkeep"
-  "CLAUDE.md" "AGENTS.md" "llms.txt" "00 Inicio Rapido.md"
-  "Matriz Definitiva.md" "SOPS.md" "Vault System Map.md"
-  "README.md" "VERSION" "vault-manifest.json" "setup.sh" "update.sh" "migrate-okf.sh" "personalize.sh" "team-mode.sh" "owner.env.example" "LICENSE"
-  ".github/CODEOWNERS.example" ".github/workflows/verify.yml" ".github/workflows/template-update.yml"
+  "AGENTS.md" "README.md" "VERSION" "vault-manifest.json"
+  "install.sh" "update.sh" "personalize.sh" "owner.env.example"
+  "LICENSE" "LICENSE-CONTENT"
 )
-# Ojo: se lista el .example, NO ".github" entero. Los archivos de .github que
+# Ojo: se listan los workflows uno por uno, NO ".github" entero. Los archivos de .github que
 # sean framework se agregan acá uno por uno. (El filtro de más abajo ya cubre el
 # caso general —un archivo propio dentro de una ruta de framework— así que esto
 # dejó de ser la única defensa; se mantiene porque listar solo lo que es
@@ -42,7 +36,7 @@ FRAMEWORK_PATHS=(
 # Mismo criterio que `.github/CODEOWNERS`: se sincroniza el ejemplo, no el real.
 
 MODE="${1:-interactive}"
-git remote get-url "$REMOTE" >/dev/null 2>&1 || { echo "Falta remote '$REMOTE'. Corré ./setup.sh"; exit 1; }
+git remote get-url "$REMOTE" >/dev/null 2>&1 || { echo "Falta remote '$REMOTE'. Corré ./install.sh"; exit 1; }
 git fetch "$REMOTE" "$BRANCH" --quiet
 
 LOCAL_V=$(cat VERSION 2>/dev/null || echo "?")

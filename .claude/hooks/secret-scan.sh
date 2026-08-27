@@ -74,7 +74,7 @@ if [ "$violations" -gt 0 ]; then
   echo "" >&2
   if [ -n "$RANGE_BASE" ]; then
     echo "PR BLOQUEADO por secretos. Un secreto que llegó a una rama publicada YA se filtró:" >&2
-    echo "rotalo en el sistema de origen ANTES de limpiar el historial. Ver SOP de Seguridad §5." >&2
+    echo "rotalo en el sistema de origen ANTES de limpiar el historial." >&2
   else
     echo "Commit ABORTADO por secretos. Sacá el secreto del stage, movelo a una variable de entorno" >&2
     echo "o a un gestor de secretos, y confirmá que .gitignore lo cubra. Ver el README, sección Seguridad." >&2
