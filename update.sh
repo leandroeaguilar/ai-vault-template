@@ -16,7 +16,7 @@ FRAMEWORK_PATHS=(
   "01 Index/.gitkeep" "02 MOCs/.gitkeep" "03 Proyectos/.gitkeep"
   "04 Knowledge/.gitkeep" "06 Raw/.gitkeep" "99 Archivo/.gitkeep"
   "05 Diario/Bitácora Agentes/_Acerca de esta bitácora.md"
-  "AGENTS.md" "README.md" "VERSION" "vault-manifest.json"
+  "AGENTS.md" "README.md" "CHANGELOG.md" "VERSION" "vault-manifest.json"
   "install.sh" "update.sh" "personalize.sh" "owner.env.example"
   "LICENSE" "LICENSE-CONTENT"
 )

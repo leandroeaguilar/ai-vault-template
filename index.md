@@ -12,6 +12,7 @@ okf_version: "0.2"
 
 * [AGENTS.md](<AGENTS.md>)
 * [AI Vault Template](<README.md>)
+* [Changelog](<CHANGELOG.md>)
 
 # Archivos
 
