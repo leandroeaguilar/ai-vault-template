@@ -3,7 +3,7 @@
 # apagara la guarda de todos los demás.
 .vault-meta/
 
-# Identidad de quien instala el toolkit (la crea a partir del .example).
+# Identidad de quien instala la plantilla (la crea a partir del .example).
 # Nunca se versiona: es lo único que distingue tu copia de la de cualquier otro.
 owner.env
 

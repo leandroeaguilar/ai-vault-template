@@ -53,10 +53,10 @@ Dónde vive el `settings.json` decide **en qué carpetas** se disparan los hooks
 
 | Ubicación del `settings.json` | Alcance | Cuándo usarla |
 |---|---|---|
-| `<vault>/.claude/settings.json` (**proyecto**) | Solo cuando Claude Code corre **dentro de este vault** | **Nuestro caso.** Los 4 hooks del Sistema Maestro están acá → no aparecen en otras carpetas. |
+| `<vault>/.claude/settings.json` (**proyecto**) | Solo cuando Claude Code corre **dentro de este vault** | **Nuestro caso.** Los hooks de este vault están acá → no aparecen en otras carpetas. |
 | `~/.claude/settings.json` (**global**) | **Toda** carpeta donde arranques Claude Code | Solo si querés que el hook aplique a varios proyectos. Entonces el script debe ser "a-prueba-de-no-vault" (salir limpio si no encuentra el vault). |
 
-> **Regla:** un hook específico de un sistema va en el `settings.json` **de ese proyecto**, nunca en el global. Poner un hook de vault en el global lo dispararía en cada sesión de Claude Code (aunque no tenga que ver con el vault). Por eso `session-context.sh` y compañía viven en el settings del proyecto: quedan **aislados** al Sistema Maestro. (Contraste: `claude-obsidian` instala en global y por eso diseñó sus hooks para salir sin error en sesiones no-vault.)
+> **Regla:** un hook específico de un sistema va en el `settings.json` **de ese proyecto**, nunca en el global. Poner un hook de vault en el global lo dispararía en cada sesión de Claude Code (aunque no tenga que ver con el vault). Por eso `session-context.sh` y compañía viven en el settings del proyecto: quedan **aislados** a este vault. (Contraste: `claude-obsidian` instala en global y por eso diseñó sus hooks para salir sin error en sesiones no-vault.)
 
 ---
 

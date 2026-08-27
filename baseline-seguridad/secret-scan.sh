@@ -48,7 +48,7 @@ done <<< "$staged"
 if [ "$violations" -gt 0 ]; then
   echo "" >&2
   echo "Commit ABORTADO por secretos. Sacá el secreto del stage, movelo a una variable de entorno" >&2
-  echo "o a un gestor de secretos, y confirmá que .gitignore lo cubra. Ver el README del toolkit." >&2
+  echo "o a un gestor de secretos, y confirmá que .gitignore lo cubra. Ver el README del repositorio." >&2
   echo "(Falso positivo puntual: git commit --no-verify, o kill-switch .vault-meta/secret-scan.disabled)" >&2
   exit 1
 fi

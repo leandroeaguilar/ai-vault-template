@@ -1,6 +1,6 @@
 # Baseline de Seguridad — kit portable para proyectos externos
 
-> Kit mínimo, copiable en **cualquier proyecto de código** (no un vault), para que nazca con seguridad determinista. Es la versión reducida de la capa de seguridad de un sistema privado más grande. Distinto del **template del Sistema Maestro** (que es para clonar el vault entero); esto es solo la capa de seguridad para un repo cualquiera.
+> Kit mínimo, copiable en **cualquier proyecto de código** (no un vault), para que nazca con seguridad determinista. Es la versión reducida de la capa de seguridad de un sistema privado más grande. Distinto de la plantilla de vault de la raíz de este repositorio (que es para arrancar un vault entero); esto es solo la capa de seguridad para un repo cualquiera.
 
 ## Qué trae (y qué capa cubre)
 

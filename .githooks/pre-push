@@ -31,11 +31,12 @@ ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")"
 # owner.env). El mantenedor del template pushea desde un checkout SIN owner.env, así
 # que nunca queda bloqueado. git pasa <remote-name> <remote-url> como $1 $2.
 # El nombre del repo va hardcodeado acá: si el template se renombra, ESTA línea
-# es la que hay que tocar. Matchea los dos nombres que tuvo — `sistema-maestro-pro`
-# (el template real desde el rename del 2026-08-21) y el viejo
-# `sistema-maestro-template` — para cubrir clones con el remoto sin actualizar.
+# es la que hay que tocar. Matchea TODOS los nombres que tuvo la familia, porque un
+# clon viejo conserva el remoto sin actualizar: `ai-vault-template` (este repo desde
+# el 2026-08-27), `sistema-maestro-toolkit` (su nombre anterior), `sistema-maestro-pro`
+# (el template privado) y `sistema-maestro-template` (el público retirado en agosto).
 if [ "${ALLOW_TEMPLATE_PUSH:-0}" != "1" ] && [ -f "$ROOT/owner.env" ] \
-   && printf '%s' "${2:-}" | grep -qE 'sistema-maestro-(pro|template)'; then
+   && printf '%s' "${2:-}" | grep -qE 'ai-vault-template|sistema-maestro-(pro|template|toolkit)'; then
   cat >&2 <<'EOF'
 pre-push: ⛔ estás por pushear un vault PERSONALIZADO al repo del TEMPLATE.
 

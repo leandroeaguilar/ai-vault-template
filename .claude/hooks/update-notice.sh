@@ -19,6 +19,6 @@ fi
 L="$(cat VERSION 2>/dev/null || echo '?')"
 R="$(git show upstream/main:VERSION 2>/dev/null | tr -d '[:space:]')"
 if [ -n "$R" ] && [ "$L" != "$R" ]; then
-  echo "[TEMPLATE] Hay una actualización del Sistema Maestro: $L → $R. Corré ./update.sh (tu contenido no se toca; ./update.sh --check para ver el detalle)."
+  echo "[TEMPLATE] Hay una actualización de la plantilla: $L → $R. Corré ./update.sh (tu contenido no se toca; ./update.sh --check para ver el detalle)."
 fi
 exit 0

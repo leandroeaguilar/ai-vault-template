@@ -8,7 +8,7 @@
 # Complementa el `deny` de settings.local.json (capa 1): la allowlist matchea
 # por PREFIJO del comando; este hook escanea el comando ENTERO y ataja evasiones
 # (curl embebido, `cat .env`, force-push a media línea, redirects a config).
-# Ver el README del toolkit.
+# Ver el README del repositorio.
 #
 # FAIL-OPEN: si no hay python, no bloquea (permite) — la capa 1 (permisos) sigue
 # vigente igual. Kill-switch: .vault-meta/security-guard.disabled

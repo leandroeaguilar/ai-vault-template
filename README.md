@@ -1,15 +1,15 @@
-# Sistema Maestro — Toolkit
+# AI Vault Template
 
-Las guardas, hooks y CI que hacen que un repositorio de notas sea **seguro de operar con
-agentes de IA**: guardas deterministas que bloquean antes de ejecutar, un gate de secretos
-que corre en cada commit y en cada PR, y un actualizador por whitelist para distribuir un
-template sin pisar el contenido de nadie.
+Plantilla para arrancar un **vault de conocimiento que se opera con agentes de IA sin que eso
+sea un riesgo**: guardas deterministas que bloquean antes de ejecutar, un gate de secretos en
+cada commit y en cada PR, centinelas que protegen lo que escribiste vos de ser reescrito por un
+agente, y un actualizador por whitelist para distribuir cambios sin pisar el contenido de nadie.
 
-Es la capa de ingeniería de un sistema personal más grande (un vault de Obsidian que sigue
-siendo privado). Acá está **lo que corre y lo que especifica lo que corre**: los hooks, más
-las tres carpetas de contrato que esos hooks aplican. El método —los SOPs de cómo se estudia,
-se decide y se revisa— no está. 62 archivos, 365 KB, sin dependencias más allá de `bash`,
-`git` y `python3`.
+Clonás, corrés `./install.sh`, y tenés la estructura, el contrato de documentación y las guardas
+andando. Es la capa de ingeniería de un sistema personal más grande (un vault de Obsidian que
+sigue siendo privado): acá está **lo que corre y lo que especifica lo que corre**. El método —los
+SOPs de cómo se estudia, se decide y se revisa— no está. 65 archivos, 372 KB, sin dependencias
+más allá de `bash`, `git` y `python3`.
 
 > **Por qué está publicado:** porque el código que guarda un sistema se puede leer y probar
 > en dos minutos, y el método no. Si querés evaluar el criterio detrás de esto, empezá por
@@ -21,8 +21,8 @@ se decide y se revisa— no está. 62 archivos, 365 KB, sin dependencias más al
 ## Instalación
 
 ```bash
-git clone https://github.com/leandroeaguilar/sistema-maestro-toolkit.git
-cd sistema-maestro-toolkit
+git clone https://github.com/leandroeaguilar/ai-vault-template.git
+cd ai-vault-template
 ./install.sh
 ```
 

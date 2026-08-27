@@ -6,7 +6,7 @@ security-guard.py — guardián de seguridad del vault (capa 2, PreToolUse Bash|
 Lo invoca el wrapper security-guard.sh. Escanea el comando/ruta ENTERO y bloquea
 un set ACOTADO de patrones inequívocamente peligrosos, atajando evasiones que el
 `deny` por-prefijo de settings.local.json no ve (curl embebido, `cat .env`,
-force-push a media línea, redirect a config). Ver el README del toolkit.
+force-push a media línea, redirect a config). Ver el README del repositorio.
 
 Contrato con Claude Code:
   - exit 0  -> permite la herramienta.
@@ -67,18 +67,18 @@ def check_bash(cmd):
     if NETWORK_OUT.search(cmd) or NETCAT.search(cmd):
         block("[SECURITY-GUARD] Salida de red por shell (curl/wget/nc/telnet) bloqueada. "
               "El canal sancionado del vault es WebFetch/WebSearch (o PowerShell Invoke-RestMethod "
-              "para APIs). Exfiltrar por shell rompe la tríada letal — ver el README del toolkit." + DISABLE_TROJAN)
+              "para APIs). Exfiltrar por shell rompe la tríada letal — ver el README del repositorio." + DISABLE_TROJAN)
     if READER.search(cmd) and SECRET_PATH.search(cmd) and not SAFE_SUFFIX.search(cmd):
         block("[SECURITY-GUARD] Acceso a un archivo de secretos/credenciales por shell bloqueado "
               "(.env / id_rsa / .pem / credentials.json / .ssh / .aws). Los secretos no se leen "
-              "ni copian por shell. Ver el README del toolkit." + DISABLE_TROJAN)
+              "ni copian por shell. Ver el README del repositorio." + DISABLE_TROJAN)
     if FORCE_PUSH.search(cmd):
         block("[SECURITY-GUARD] `git push --force/-f` bloqueado: reescribir historia remota es "
               "destructivo. Usá un push normal, o pedíselo al dueño del repo explícitamente." + DISABLE_TROJAN)
     if CONTROL_WRITE.search(cmd):
         block("[SECURITY-GUARD] Escritura por shell a un archivo de control (.claude/ .githooks/ "
               ".mcp.json) bloqueada: la config se edita con la herramienta Edit, no por redirect. "
-              "Ver el README del toolkit." + DISABLE_TROJAN)
+              "Ver el README del repositorio." + DISABLE_TROJAN)
     allow()
 
 def main():
@@ -92,7 +92,7 @@ def main():
         fp = ti.get('file_path') or ''
         if SECRET_PATH.search(fp) and not SAFE_SUFFIX.search(fp):
             block("[SECURITY-GUARD] Lectura de un archivo de secretos/credenciales bloqueada «%s». "
-                  "Refuerza el `deny` de Read. Ver el README del toolkit." % fp + DISABLE_TROJAN)
+                  "Refuerza el `deny` de Read. Ver el README del repositorio." % fp + DISABLE_TROJAN)
         allow()
 
     if tool == 'Bash':

@@ -23,7 +23,7 @@ resource:
 # SOP - Documentación
 
 ## 1. Objetivo
-Definir **el estándar único de cómo se documenta** en el Sistema Maestro: frontmatter, naming, `id`, estilo y ciclo de vida. Resuelve el problema de que hoy esas reglas están dispersas e inconsistentes entre documentos.
+Definir **el estándar único de cómo se documenta** en este vault: frontmatter, naming, `id`, estilo y ciclo de vida. Resuelve el problema de que hoy esas reglas están dispersas e inconsistentes entre documentos.
 
 Este SOP responde a la pregunta operativa: *"voy a crear o tocar un documento — ¿qué frontmatter le pongo, cómo lo nombro, qué estilo sigo, cuándo lo reviso?"*.
 

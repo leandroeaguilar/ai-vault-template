@@ -11,7 +11,7 @@ okf_version: "0.2"
 # Otros
 
 * [AGENTS.md](<AGENTS.md>)
-* [Sistema Maestro — Toolkit](<README.md>)
+* [AI Vault Template](<README.md>)
 
 # Archivos
 

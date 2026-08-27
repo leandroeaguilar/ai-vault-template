@@ -3,7 +3,7 @@
 """generate-index.py — regenera los index.md del vault (OKF estricto).
 
 Port de bundle/index.py del repo OKF (GoogleCloudPlatform/knowledge-catalog),
-adaptado a las convenciones del Sistema Maestro:
+adaptado a las convenciones de este vault:
 
   - index.md = listado puro SIN frontmatter (excepción: la raíz lleva okf_version).
   - Secciones agrupadas por `tipo_doc` (fallback "Otros"), orden alfabético.

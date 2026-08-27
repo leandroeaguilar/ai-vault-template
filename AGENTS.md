@@ -4,7 +4,7 @@ Ley común para cualquier agente que edite este repositorio. La leen los agentes
 estándar `AGENTS.md` (Claude Code, Codex, Antigravity, Hermes, OpenCode y los que vengan).
 
 > Este archivo es la versión pública y recortada del contrato que gobierna el vault de conocimiento
-> privado sobre el que corre este toolkit. Están las reglas que un agente necesita para no romper
+> privado del que salió esta plantilla. Están las reglas que un agente necesita para no romper
 > nada; no está la taxonomía ni el método de ese vault.
 
 ---

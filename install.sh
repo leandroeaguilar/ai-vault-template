@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Instalador del toolkit. Correr UNA vez, desde la raiz del repo donde lo usas.
+# Instalador de la plantilla. Correr UNA vez, desde la raiz del repo donde lo usas.
 # Idempotente: correrlo dos veces no rompe nada.
 set -euo pipefail
 cd "$(dirname "$0")"
 
-echo "== Sistema Maestro Toolkit — install =="
+echo "== AI Vault Template — install =="
 
 # Lo unico imprescindible: que git use .githooks/ en vez de .git/hooks/.
 # .git/hooks/ NO se versiona, asi que un hook que vive ahi no llega a nadie mas.
