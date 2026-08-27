@@ -6,9 +6,10 @@ cada commit y en cada PR, centinelas que protegen lo que escribiste vos de ser r
 agente, y un actualizador por whitelist para distribuir cambios sin pisar el contenido de nadie.
 
 Clonás, corrés `./install.sh`, y tenés la estructura, el contrato de documentación y las guardas
-andando. Es la capa de ingeniería de un sistema personal más grande (un vault de Obsidian que
+andando. El **porqué** de esa estructura —las ocho carpetas, LLM Wiki, OKF— está en
+[Cómo funciona este vault](<00 Sistema/Cómo funciona este vault.md>). Es la capa de ingeniería de un sistema personal más grande (un vault de Obsidian que
 sigue siendo privado): acá está **lo que corre y lo que especifica lo que corre**. El método —los
-SOPs de cómo se estudia, se decide y se revisa— no está. 65 archivos, 372 KB, sin dependencias
+SOPs de cómo se estudia, se decide y se revisa— no está. 69 archivos, 412 KB, sin dependencias
 más allá de `bash`, `git` y `python3`.
 
 > **Por qué está publicado:** porque el código que guarda un sistema se puede leer y probar
@@ -147,6 +148,26 @@ ignorar, y ahí perdés las dos.
 
 ---
 
+## Skills y subagente
+
+Los hooks corren solos; estas tres piezas se invocan cuando hacen falta y **cada una tiene detrás
+código de este repo que ya corrió**.
+
+| Pieza | Qué hace | Con qué se complementa |
+|---|---|---|
+| `/revisar-seguridad` | Auditoría a demanda antes de instalar o abrir algo: plugin, hook, paquete, repo externo, contenido no confiable. Nunca ejecuta el target. | Es la **capa 5** de la tabla de seguridad — la única falible, porque es criterio |
+| `/revisar-pr` | Traduce un PR de Markdown a lenguaje de vault: qué cambió de verdad, qué contradice algo ya decidido, qué no se llegó a mirar. No aprueba ni mergea. | `aviso-de-pr.yml` y el gate de `pre-commit` |
+| `verifier` (subagente) | Tier-2 del verifier: juez LLM sobre el diff *staged*, en contexto fresco, antes de commitear. Advisory, no toca archivos. | `verify-commit.sh`, que es el tier-1 determinista |
+
+**El patrón que comparten: el modelo nunca es la única capa.** `verify-commit.sh` decide lo que se
+puede decidir con un `grep`; el subagente opina sobre lo que no. La guarda determinista bloquea; la
+skill recomienda. Cuando los dos coinciden no aporta nada; cuando difieren, ahí está el hallazgo.
+
+Y las tres tienen la misma restricción escrita en el prompt: **proponen, no deciden.** No aprueban
+PRs, no mergean, no ejecutan lo que están auditando. Un agente que se autoaprueba no es un control.
+
+---
+
 ## El vault mínimo
 
 Las ocho carpetas (`00 Sistema` … `99 Archivo`) no son decoración: **ocho de los hooks las
@@ -253,8 +274,9 @@ Todo se apaga por archivo: `.vault-meta/<nombre>.disabled`.
 ## Qué NO está acá
 
 Los 26 SOPs de método —cómo se estudia, se decide, se revisa, se construye carrera—, las 11
-plantillas restantes, las skills, los MOCs y el `CLAUDE.md` con la taxonomía completa. Eso es
-un sistema privado y no se publica.
+plantillas restantes, las 9 skills de método (auditoría de conocimiento, revisión mensual, notas de
+estudio), los MOCs y el `CLAUDE.md` con la taxonomía completa. Eso es un sistema privado y no se
+publica.
 
 La línea de corte: **entra lo que ejecuta, y lo que especifica lo que ejecuta.** `SOP
 Documentación` entra porque el verifier lo aplica en cada commit; un SOP sobre cómo escribir

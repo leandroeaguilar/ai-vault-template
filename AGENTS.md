@@ -15,12 +15,14 @@ Antes de crear, mover o resumir información:
 
 1. Leer este archivo.
 2. Leer el [README](<README.md>) — qué hace cada guarda y qué asume.
-3. Leer [SOP Documentación](<00 Sistema/SOP Documentación.md>) — el contrato de frontmatter,
+3. Leer [Cómo funciona este vault](<00 Sistema/Cómo funciona este vault.md>) — por qué las ocho
+   carpetas, por qué LLM Wiki, por qué OKF.
+4. Leer [SOP Documentación](<00 Sistema/SOP Documentación.md>) — el contrato de frontmatter,
    naming y enlaces que el verifier aplica en cada commit.
-4. Revisar si la nota ya existe.
-5. No duplicar.
-6. No borrar sin propuesta previa.
-7. Priorizar claridad y portabilidad.
+5. Revisar si la nota ya existe.
+6. No duplicar.
+7. No borrar sin propuesta previa.
+8. Priorizar claridad y portabilidad.
 
 ---
 
