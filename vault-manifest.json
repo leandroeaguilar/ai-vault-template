@@ -1,7 +1,8 @@
 {
   "template": "ai-vault-template",
-  "version": "0.4.0",
-  "released": "2026-08-27",
+  "upstream": "https://github.com/leandroeaguilar/ai-vault-template.git",
+  "version": "0.5.0",
+  "released": "2026-09-20",
   "description": "Guardas, hooks y CI para operar un repositorio de notas con agentes de IA. Seguridad determinista en 4 capas (deny en settings.json, security-guard en PreToolUse, secret-scan en pre-commit, security-audit), centinelas @user/@generated, verifier pre-commit e índices index.md generados. Incluye el vault mínimo que esos hooks asumen: las 8 capas, 3 plantillas y los SOPs que especifican el contrato que el verifier aplica. Gate de git agnóstico de harness: los centinelas y el bloqueo de reescritura de historia corren para cualquier agente, no solo Claude Code.",
   "infrastructure": [
     ".claude/**",
@@ -32,8 +33,12 @@
     "LICENSE-CONTENT"
   ],
   "scaffold": {
-    "owner.env": "Identidad de la instancia (OWNER/OWNER_EMAIL/OWNER_GITHUB) — se crea desde owner.env.example; gitignorada; jamás se pisa",
+    "owner.env": "Identidad de la instancia (OWNER/OWNER_EMAIL/OWNER_GITHUB) — la crea install.sh desde owner.env.example; gitignorada; jamás se pisa",
+    "FIRST_RUN.md": "Cartel de instancia sin inicializar — lo borran install.sh y /onboarding al terminar; una vez borrado, update.sh no lo devuelve",
+    "01 Index/Vision.md": "Stub de arranque — se llena una vez (a mano o con /onboarding) y nunca se pisa",
+    "01 Index/Objetivos.md": "Stub de arranque — ídem",
+    "01 Index/Mapa Personal.md": "Stub de arranque — ídem",
     "vault.conf": "Gobernanza de la instancia (VAULT_MODE/MAIN_BRANCH/TEAM_MEMBERS) — VERSIONADA a propósito: tiene que llegar al clon de cada persona. Fuera de infrastructure: update.sh pisaría el `equipo` con el `personal` del template"
   },
-  "notes": "update.sh solo toca 'infrastructure'. 'scaffold' se instala una vez y no se pisa. Todo lo demás es contenido del usuario y NUNCA se toca. Toda ruta listada acá existe en el repositorio: si agregás una entrada, agregá el archivo."
+  "notes": "La clave 'upstream' es la fuente única de la URL del template: install.sh la lee de acá en vez de hardcodearla (el regex de familia de .githooks/pre-push es otra cosa — tiene que seguir matcheando los nombres viejos). update.sh solo toca 'infrastructure'. 'scaffold' se instala una vez y no se pisa. Todo lo demás es contenido del usuario y NUNCA se toca. Toda ruta listada acá existe en el repositorio: si agregás una entrada, agregá el archivo."
 }

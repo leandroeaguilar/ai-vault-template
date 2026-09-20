@@ -1,34 +1,43 @@
 #!/usr/bin/env bash
-# Reemplaza los placeholders {{OWNER}}/{{OWNER_EMAIL}}/{{OWNER_GITHUB}} usando owner.env.
-# Idempotente. update.sh lo corre automáticamente tras cada actualización.
+# Reemplaza los placeholders de owner ({{ OWNER }}, {{ OWNER_EMAIL }},
+# {{ OWNER_GITHUB }}) usando owner.env.
+#
+# Idempotente. Lo encadena install.sh, y update.sh lo re-corre tras cada
+# actualizacion para resolver los placeholders de los archivos nuevos.
+#
+# NO hace falta correrlo a mano: es el paso 5 de install.sh. Se deja invocable
+# por separado porque update.sh lo necesita asi.
 set -euo pipefail
 cd "$(dirname "$0")"
 
-# ── Guard: no personalizar una instancia recién clonada "a mano"/desde afuera ──
-# La inicialización correcta es interactiva, vía /onboarding, desde una sesión de
-# agente abierta DENTRO de esta carpeta. La presencia de FIRST_RUN.md marca "sin
-# inicializar todavía". /onboarding exporta SM_ONBOARDING=1 al llamar acá; update.sh
-# corre post-onboarding (ya no existe FIRST_RUN.md), así que no queda bloqueado.
-if [ -f FIRST_RUN.md ] && [ "${SM_ONBOARDING:-0}" != "1" ] && [ "${FORCE:-0}" != "1" ]; then
+if [ ! -f owner.env ]; then
   cat >&2 <<'MSG'
-⛔ Esta instancia todavía no está inicializada — no la personalices a mano ni desde afuera.
+No hay owner.env, asi que no hay con que reemplazar los placeholders.
 
-   La inicialización es interactiva y desde adentro:
-   1. Abrí ESTA carpeta como una sesión propia de tu agente (Claude Code / Codex / …).
-   2. Pedí:  /onboarding   (hace la entrevista y personaliza el vault correctamente).
+  cp owner.env.example owner.env     # y completalo
+  ./install.sh                       # retoma desde ahi
 
-   ¿Sabés lo que hacés y querés forzar la personalización mecánica igual?
-     →  FORCE=1 ./personalize.sh
+(O, con un agente: abri esta carpeta con Claude Code y pedi /onboarding.)
 MSG
-  exit 1
+  exit 0
 fi
 
-[ -f owner.env ] || { echo "No hay owner.env — corré la skill /onboarding (o creá owner.env: OWNER=..., OWNER_EMAIL=..., OWNER_GITHUB=...)"; exit 0; }
 # shellcheck disable=SC1091
 source ./owner.env
 : "${OWNER:?owner.env sin OWNER=}"
+
+# NOTA: hasta la v0.4.0 aca habia un guard que ABORTABA si existia FIRST_RUN.md y
+# mandaba a correr /onboarding — un comando que este repositorio no traia. Era un
+# callejon sin salida para quien instalaba a mano. Se saco por principio, no por
+# comodidad: el camino de shell es CANONICO, no un plan B. Esta plantilla tiene
+# que poder instalarse sin ningun agente, igual que sus guardas tienen que correr
+# sin ningun harness. Quien avisa de lo que falta ahora es install.sh, al final.
+
 # sed -i NO es portable: GNU no lleva sufijo, BSD/macOS lo exige. Se evita del todo
-# reescribiendo cada archivo vía temp-file (funciona igual en Linux, macOS y Git-Bash).
+# reescribiendo cada archivo via temp-file (funciona igual en Linux, macOS y Git-Bash).
+#
+# Alcance: .md y .txt. NO toca .py ni .sh — un placeholder hardcodeado en un hook
+# no se resuelve nunca por esta via (agent-diary.sh lee owner.env en runtime).
 find . -path ./.git -prune -o -type f \( -name "*.md" -o -name "*.txt" \) -print0 | \
   while IFS= read -r -d '' f; do
     sed -e "s/{{OWNER_EMAIL}}/${OWNER_EMAIL:-}/g" \

@@ -9,6 +9,67 @@ contra el del upstream para decidir si una instancia está atrasada — por eso 
 
 ---
 
+## [0.5.0] — 2026-09-20
+
+El procedimiento de instalación documentado dejaba la instancia a medias. La causa no eran tres
+errores sueltos: esta plantilla se talló de un template privado y se llevó `personalize.sh` **sin
+las dos piezas de las que depende** (`FIRST_RUN.md` y la skill de onboarding). Esta versión cierra
+la extracción y fija el principio que faltaba: **el camino de shell es canónico, no un plan B** —
+la plantilla tiene que poder instalarse sin ningún agente, igual que sus guardas corren sin ningún
+harness.
+
+### Agregado
+- **`/onboarding`** — la entrevista guiada, ahora sí publicada: identidad, modo de gobernanza y
+  los tres stubs de `01 Index/`. Es **comodidad, no requisito**: todo lo imprescindible lo hace
+  `install.sh`. No arrastra `team-mode.sh` ni `entity-mode.sh`, que siguen siendo del template
+  privado.
+- **`FIRST_RUN.md`** — el cartel de instancia sin inicializar que `personalize.sh` ya esperaba
+  encontrar desde la v0.1.0. Documenta los dos caminos, y lo borran tanto `install.sh` como
+  `/onboarding`.
+- **Tres stubs en `01 Index/`** (`Vision`, `Objetivos`, `Mapa Personal`) — lo único que un script
+  no puede inventar. Son `scaffold`: una vez que los llenás o los borrás, `update.sh` no te los
+  devuelve.
+- **`upstream` en `vault-manifest.json`** — la URL canónica del template, declarada **una sola
+  vez**. `install.sh` la lee de ahí en vez de hardcodearla: duplicarla repetiría el incidente de
+  la v0.3.0, donde un rename dejó un nombre hardcodeado como código muerto un release entero. El
+  regex de familia de `pre-push` se queda donde está, porque es otra cosa — tiene que seguir
+  matcheando los nombres viejos.
+
+### Cambiado
+- **`install.sh` es reanudable y hace la instalación entera.** Suma el remote `upstream` y encadena
+  la identidad: si falta `owner.env` lo crea desde el ejemplo y para; lo completás, lo volvés a
+  correr y termina. **La instalación pasó de seis pasos manuales a dos comandos.**
+- **`install.sh` distingue los dos contextos en los que corre**, con la misma señal que usa
+  `pre-push`: si `origin` apunta a la familia del template, no agrega `upstream` **y no crea
+  `owner.env`**. Lo segundo es lo importante: crearlo en el checkout del mantenedor le bloquearía
+  sus propios push, porque es justamente su ausencia lo que `pre-push` usa para reconocerlo. A
+  quien clonó en vez de forkear, el aviso le llega ahora al instalar y no al pushear.
+
+### Arreglado
+- **`personalize.sh` mandaba a `/onboarding`, un comando que este repositorio no traía.** Callejón
+  sin salida para quien instalaba a mano. Ahora la skill existe, y el mensaje de "falta
+  `owner.env`" apunta primero al camino de shell.
+- **El guard de `FIRST_RUN.md` en `personalize.sh` estaba muerto**: chequeaba un archivo que la
+  plantilla no publicaba, así que nunca disparaba. Se sacó del todo en vez de revivirlo — bloquear
+  la personalización manual contradice el principio de arriba.
+- **`update.sh` exigía un remote `upstream` que `install.sh` no creaba**, y al faltar mandaba a
+  correr `install.sh`, que era justo lo que no lo agregaba.
+- **`update.sh` invocaba `team-mode.sh`**, que no existe en esta plantilla. La llamada estaba
+  guardada con `[ -f ]`, así que no rompía nada, pero documentaba un archivo fantasma. Sacada,
+  junto con dos comentarios que referenciaban `.github/CODEOWNERS`.
+- **`00 Sistema/Cómo funciona este vault.md` §5 duplicaba el procedimiento de instalación y ya
+  había derivado** respecto del README: omitía el fork y el `upstream`, y afirmaba que el verifier
+  *frena* un commit con frontmatter incompleto cuando es **warn-only** por defecto. Ahora apunta al
+  README en vez de repetirlo — misma regla que el propio repo aplica a las dos whitelists.
+- **README reescrito.** Era un buen ensayo de diseño y un mal manual: la proporción porqué/cómo era
+  de 80/20 y ese 20 describía menos de la mitad del procedimiento real. Trece secciones, con el
+  ensayo íntegro en el puesto 7. Además: los kill-switches documentados **eran falsos para 11 de
+  16** (`agent-diary.sh` se apaga con `diary.disabled`, no con `agent-diary.disabled`); la licencia
+  se clasificaba por extensión, así que los `.md` dentro de `.claude/` caían en MIT y CC BY-NC-SA a
+  la vez; `baseline-seguridad/` —la respuesta real a "cómo lo uso en mi repo"— no se nombraba ni
+  una vez; y los conteos de archivos, líneas y hooks estaban desactualizados. Todo dato verificable
+  lleva fecha.
+
 ## [0.4.0] — 2026-08-27
 
 ### Agregado

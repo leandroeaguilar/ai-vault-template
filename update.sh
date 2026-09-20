@@ -33,7 +33,10 @@ FRAMEWORK_PATHS=(
 # de la instancia: VAULT_MODE, MAIN_BRANCH, TEAM_MEMBERS. Si entrara acá, cada
 # `update.sh` pisaría el `equipo` de un vault de organización con el `personal`
 # del template — apagando el gate de rama sin que nadie lo haya pedido.
-# Mismo criterio que `.github/CODEOWNERS`: se sincroniza el ejemplo, no el real.
+#
+# Mismo criterio para `FIRST_RUN.md` y los stubs de `01 Index/`: son scaffold. Se
+# instalan con el clon y, una vez que los llenaste o los borraste, un update no
+# te los devuelve.
 
 MODE="${1:-interactive}"
 git remote get-url "$REMOTE" >/dev/null 2>&1 || { echo "Falta remote '$REMOTE'. Corré ./install.sh"; exit 1; }
@@ -58,10 +61,10 @@ CHANGED=$(git -c core.quotepath=false diff --name-only HEAD "$REMOTE/$BRANCH" --
 #   · el archivo aparece SIEMPRE en la lista, así que "Nada que actualizar" deja
 #     de ser alcanzable aunque el framework esté al día;
 #   · si cae último, el `while` devuelve 1 y con `set -euo pipefail` el script
-#     aborta ANTES de personalize.sh y team-mode.sh — update a medio aplicar.
+#     aborta ANTES de personalize.sh — update a medio aplicar.
 # Se filtran los que no existen upstream: no son framework, son tu contenido.
-# (Es la misma trampa que el comentario de FRAMEWORK_PATHS describe para
-#  .github/CODEOWNERS, pero resuelta de raíz en vez de esquivada ruta por ruta.)
+# Se resuelve de raíz —un filtro para todos los casos— en vez de esquivarse ruta
+# por ruta sacándolas de la whitelist a medida que aparecen.
 #
 # ⚠️ La pertenencia se resuelve con `ls-tree` + `grep -Fxq`, NO con
 # `git cat-file -e "$REMOTE/$BRANCH:$f"`. En Git Bash (MSYS2, o sea Windows) ese
@@ -133,8 +136,6 @@ if [ -n "$FALLIDOS" ]; then
 fi
 echo ""
 if [ -f owner.env ]; then bash ./personalize.sh; fi
-# Re-aplica la capa multi-persona (no-op en modo personal; nunca pisa lo existente).
-if [ -f team-mode.sh ]; then bash ./team-mode.sh; fi
 if [ "$SELF_STALE" = "1" ] && printf '%s\n' "$CHANGED" | grep -qx "update.sh"; then
   echo "⚠ update.sh se actualizó a sí mismo — corré ./update.sh una vez más para aplicar la whitelist nueva."
 fi

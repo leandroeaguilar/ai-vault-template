@@ -5,6 +5,7 @@ okf_version: "0.2"
 # Capas del sistema
 
 * [00 Sistema](<00 Sistema/index.md>)
+* [01 Index](<01 Index/index.md>)
 * [05 Diario](<05 Diario/index.md>)
 * [baseline-seguridad](<baseline-seguridad/index.md>)
 
@@ -13,6 +14,7 @@ okf_version: "0.2"
 * [AGENTS.md](<AGENTS.md>)
 * [AI Vault Template](<README.md>)
 * [Changelog](<CHANGELOG.md>)
+* [👋 Primera vez acá](<FIRST_RUN.md>)
 
 # Archivos
 

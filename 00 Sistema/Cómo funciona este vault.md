@@ -127,11 +127,21 @@ El detalle de cada una está en el [README](<../README.md>).
 
 ## 5. Primeros pasos
 
-1. `./install.sh` — cablea `core.hooksPath` y crea `.vault-meta/`.
-2. Copiá `owner.env.example`, completalo y corré `./personalize.sh`.
-3. Abrí la carpeta con Obsidian (opcional, pero las plantillas usan Templater).
-4. Escribí tu primera nota desde `001_plantillas/Plantilla Nota.md` e intentá commitearla con el
-   frontmatter incompleto. **Que el verifier te frene es la señal de que está andando.**
+El procedimiento de instalación vive en **un solo lugar**, el [README](<../README.md>) §3, y no se
+repite acá: cuando estuvo en los dos, los dos derivaron. En corto son dos comandos —`./install.sh`,
+completás `owner.env`, `./install.sh` otra vez— y el instalador te va diciendo qué falta.
+
+Lo que sí corresponde a este documento es **qué hacer después**, cuando la maquinaria ya corre:
+
+1. Llená los tres stubs de `01 Index/` (Vision, Objetivos, Mapa Personal). Es lo único que ningún
+   script puede inventar por vos, y es la capa de orientación de la que habla §1.
+2. Abrí la carpeta con Obsidian (opcional, pero las plantillas usan Templater).
+3. Escribí tu primera nota desde `001_plantillas/Plantilla Nota.md` y commiteala **con el
+   frontmatter incompleto a propósito**. El verifier te va a **avisar** qué campo falta, sin
+   frenarte: es warn-only por defecto, porque la regla del sistema es que el frontmatter se
+   normaliza *al tocar* un documento, no en una migración retroactiva el día uno. Ese aviso es la
+   señal de que está andando. Si querés que además bloquee:
+   `touch .vault-meta/verifier.strict` (README §10.3).
 
 Lo que este repositorio **no** trae es el método: cómo estudiar, cómo decidir, cómo revisar, cómo
 construir carrera encima de esto. Eso es contenido de cada quien, y la plantilla está hecha para no
