@@ -19,7 +19,7 @@ FRAMEWORK_PATHS=(
   "AGENTS.md" "README.md" "DECISIONES.md" "REFERENCIA.md" "CHANGELOG.md"
   "VERSION" "vault-manifest.json"
   "install.sh" "update.sh" "personalize.sh" "owner.env.example"
-  "LICENSE" "LICENSE-CONTENT" "Mapa de mis agentes.html"
+  "LICENSE" "LICENSE-CONTENT" "Mapa de mis agentes.html" "assets"
 )
 # Los workflows se listan uno por uno, NO ".github" entero.
 # Los index.md de carpeta son artefactos GENERADOS (generate-index.py en pre-commit):

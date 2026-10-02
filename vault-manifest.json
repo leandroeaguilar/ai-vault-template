@@ -34,7 +34,8 @@
     "owner.env.example",
     "LICENSE",
     "LICENSE-CONTENT",
-    "Mapa de mis agentes.html"
+    "Mapa de mis agentes.html",
+    "assets/**"
   ],
   "scaffold": {
     "Dashboard.md": "Dashboard principal de bienvenida, navegación del vault y observabilidad de agentes",

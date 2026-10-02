@@ -27,6 +27,26 @@ tomás notas: impone un contrato de *metadatos*, seguridad y flujos.
 
 ---
 
+## 👁️ Vistas del Sistema
+
+<div align="center">
+
+### Centro de Control & Tablero Kanban (`Mapa de mis agentes.html`)
+*Observabilidad visual offline de agentes, contratos, roadmap y tareas en vivo — generado en local a 0 tokens en modo oscuro.*
+
+![Centro de Control y Mapa de Agentes](assets/mapa-agentes.png)
+
+<br/>
+
+### Grafo de Conocimiento Vivo (Obsidian Graph View)
+*Red de conexiones emergentes entre SOPs, MOCs, conocimiento y proyectos: «Menos carpetas, más conexiones».*
+
+![Grafo de Conocimiento en Obsidian](assets/obsidian-graph.png)
+
+</div>
+
+---
+
 ## 1. Qué obtenés
 
 ```text

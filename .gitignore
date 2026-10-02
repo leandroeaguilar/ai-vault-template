@@ -17,3 +17,6 @@ credentials.json
 
 __pycache__/
 *.pyc
+
+# Obsidian cache y estado local de UI
+.obsidian/
