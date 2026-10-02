@@ -1,6 +1,6 @@
 # AI Vault Template
 
-[![versión](https://img.shields.io/badge/versión-v0.6.0-blue)](CHANGELOG.md)
+[![versión](https://img.shields.io/badge/versión-v0.7.0-blue)](CHANGELOG.md)
 [![licencia](https://img.shields.io/badge/código-MIT-green)](LICENSE)
 [![contenido](https://img.shields.io/badge/contenido-CC%20BY--NC--SA%204.0-lightgrey)](LICENSE-CONTENT)
 
@@ -10,6 +10,7 @@ agente de IA sin que eso sea un riesgo:
 - **ningún secreto entra al historial**: se bloquea el commit, y también el PR;
 - **ningún comando peligroso se ejecuta**: se inspecciona antes, no después;
 - **lo que escribiste vos no lo reescribe un agente**: se marca y se verifica en cada commit;
+- **las tareas y recibos no pisan tu trabajo**: tablero Headless Kanban con validación humana;
 - **las mejoras del template te llegan** sin pisar una línea de tu contenido.
 
 Todo eso corre con `bash` y `git`. Claude Code agrega comodidades, pero **no hace falta**: las
@@ -28,21 +29,24 @@ notas: impone un contrato de *metadatos*, no de método.
 
 ```
 tu-vault/
-├── 00 Sistema/           el contrato: SOPs, plantillas, spec de centinelas
+├── 00 Sistema/           el contrato: SOPs, plantillas, flujos.yml, centinelas
 ├── 01 Index/             navegación: visión, objetivos, mapa personal
 ├── 02 MOCs/              mapas temáticos
-├── 03 Proyectos/         iniciativas con inicio y fin
+├── 03 Proyectos/         iniciativas + Kanban/ (Pendientes, En_Progreso, Hecho)
 ├── 04 Knowledge/         conocimiento reutilizable
 ├── 05 Diario/            diario operativo + bitácora de agentes
 ├── 06 Raw/               fuentes sin procesar
 ├── 99 Archivo/           terminado o retirado
 │
-├── .claude/              22 hooks, 3 skills, 1 subagente, settings.json
+├── .agents/              estándar universal: 5 skills agnósticas (AGENTS.md)
+├── .claude/              22 hooks, 3 commands, scripts deterministas
 ├── .githooks/            pre-commit, pre-push
 ├── .github/workflows/    los mismos gates, del lado del servidor
 ├── baseline-seguridad/   kit portable: llevás solo la seguridad a otro repo
 │
-├── AGENTS.md             la ley que lee cualquier agente antes de escribir
+├── AGENTS.md             la ley común que lee cualquier agente antes de escribir
+├── Dashboard.md          panel de bienvenida y navegación en Obsidian
+├── Mapa de mis agentes   observabilidad visual interactiva (HTML offline, 0 tokens)
 ├── vault.conf            gobernanza: personal o equipo
 └── install.sh · update.sh · personalize.sh
 ```

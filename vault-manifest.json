@@ -1,10 +1,11 @@
 {
   "template": "ai-vault-template",
   "upstream": "https://github.com/leandroeaguilar/ai-vault-template.git",
-  "version": "0.6.0",
-  "released": "2026-09-22",
-  "description": "Guardas, hooks y CI para operar un repositorio de notas con agentes de IA. Seguridad determinista en 4 capas (deny en settings.json, security-guard en PreToolUse, secret-scan en pre-commit, security-audit), centinelas @user/@generated, verifier pre-commit e índices index.md generados. Incluye el vault mínimo que esos hooks asumen: las 8 capas, 3 plantillas y los SOPs que especifican el contrato que el verifier aplica. Gate de git agnóstico de harness: los centinelas y el bloqueo de reescritura de historia corren para cualquier agente, no solo Claude Code.",
+  "version": "0.7.0",
+  "released": "2026-10-02",
+  "description": "Guardas, hooks, CI y arquitectura multi-agente para operar un repositorio de notas con agentes de IA. Seguridad determinista en 4 capas (deny en settings.json, security-guard en PreToolUse, secret-scan en pre-commit, security-audit), centinelas @user/@generated, verifier pre-commit e índices index.md generados. Incluye estándar universal .agents/skills/, tablero Headless Kanban con patrón de recibos humanos y mapa visual de observabilidad agéntica.",
   "infrastructure": [
+    ".agents/**",
     ".claude/**",
     ".githooks/**",
     ".gitattributes",
@@ -32,9 +33,16 @@
     "personalize.sh",
     "owner.env.example",
     "LICENSE",
-    "LICENSE-CONTENT"
+    "LICENSE-CONTENT",
+    "Mapa de mis agentes.html"
   ],
   "scaffold": {
+    "Dashboard.md": "Dashboard principal de bienvenida, navegación del vault y observabilidad de agentes",
+    "03 Proyectos/Kanban/README.md": "Punto de partida y guía operativa del tablero Headless Kanban",
+    "03 Proyectos/Kanban/Pendientes/.gitkeep": "Cola de tareas pendientes del tablero Headless Kanban",
+    "03 Proyectos/Kanban/En_Progreso/.gitkeep": "Cola de tareas en progreso del tablero Headless Kanban",
+    "03 Proyectos/Kanban/Hecho/.gitkeep": "Cola de tareas completadas del tablero Headless Kanban",
+    "03 Proyectos/Kanban/Archivado/.gitkeep": "Histórico de tareas archivadas del tablero Headless Kanban",
     "owner.env": "Identidad de la instancia (OWNER/OWNER_EMAIL/OWNER_GITHUB) — la crea install.sh desde owner.env.example; gitignorada; jamás se pisa",
     "FIRST_RUN.md": "Cartel de instancia sin inicializar — lo borran install.sh y /onboarding al terminar; una vez borrado, update.sh no lo devuelve",
     "01 Index/Vision.md": "Stub de arranque — se llena una vez (a mano o con /onboarding) y nunca se pisa",

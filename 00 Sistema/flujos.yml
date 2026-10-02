@@ -1,0 +1,21 @@
+# flujos.yml - Especificación declarativa de flujos de trabajo multi-agente
+# Formato: 2 espacios para lista de flujos, 4 para atributos, 6 para lista de pasos, 8 para atributos de paso.
+
+flujos:
+  - nombre: Mantenimiento y Auditoría del Vault
+    descripcion: Pipeline de higiene, verificación de enlaces y seguridad determinista del repositorio.
+    disparador: Manual o periódico
+    frecuencia: Semanal / Bajo demanda
+    pasos:
+      - perfil: mantenedor
+        skill: check-links
+        nota: Escanear y validar la integridad de todos los enlaces internos y notas huérfanas.
+      - perfil: mantenedor
+        skill: security-audit
+        nota: Auditar historial de commits, secretos, integridad de .gitignore y configuración de hooks.
+      - perfil: verifier
+        skill: verifier
+        nota: Verificar metadatos y frontmatter canónico antes de consolidar el reporte.
+      - perfil: general
+        skill: agent-diary
+        nota: Registrar el resultado de la sesión de mantenimiento en la Bitácora de Agentes.

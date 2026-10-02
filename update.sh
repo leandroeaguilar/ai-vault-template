@@ -10,7 +10,7 @@ REMOTE="upstream"; BRANCH="main"
 
 # Whitelist de framework (sincronizada con vault-manifest.json → infrastructure)
 FRAMEWORK_PATHS=(
-  ".claude" ".githooks" ".gitattributes" ".gitignore"
+  ".agents" ".claude" ".githooks" ".gitattributes" ".gitignore"
   ".github/workflows/verify.yml" ".github/workflows/aviso-de-pr.yml"
   "00 Sistema" "baseline-seguridad"
   "01 Index/.gitkeep" "02 MOCs/.gitkeep" "03 Proyectos/.gitkeep"
@@ -19,7 +19,7 @@ FRAMEWORK_PATHS=(
   "AGENTS.md" "README.md" "DECISIONES.md" "REFERENCIA.md" "CHANGELOG.md"
   "VERSION" "vault-manifest.json"
   "install.sh" "update.sh" "personalize.sh" "owner.env.example"
-  "LICENSE" "LICENSE-CONTENT"
+  "LICENSE" "LICENSE-CONTENT" "Mapa de mis agentes.html"
 )
 # Los workflows se listan uno por uno, NO ".github" entero.
 # Los index.md de carpeta son artefactos GENERADOS (generate-index.py en pre-commit):

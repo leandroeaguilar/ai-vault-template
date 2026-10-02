@@ -9,6 +9,18 @@ contra el del upstream para decidir si una instancia está atrasada — por eso 
 
 ---
 
+## [0.7.0] — 2026-10-02
+
+Arquitectura multi-agente universal, Headless Kanban con patrón de recibos humanos y mapa visual de observabilidad.
+
+### Agregado
+- **Estándar Universal `.agents/skills/`**: 5 skills canónicas de infraestructura (`agent-diary`, `check-links`, `verifier`, `security-audit`, `crear-tarea`), legibles por Claude Code, Codex, Antigravity y OpenCode bajo la especificación `AGENTS.md`.
+- **Tablero Headless Kanban (`03 Proyectos/Kanban/`)**: Directorios `Pendientes/`, `En_Progreso/`, `Hecho/`, `Archivado/` declarados en scaffold, con su guía en `README.md` y `Plantilla Tarjeta Kanban.md`.
+- **Patrón de Recibos y Validación Humana (Human-in-the-Loop)**: Desacoplamiento asíncrono donde los agentes proponen y dejan recibos en Kanban sin sobreescribir el contenido final del usuario.
+- **Observabilidad Visual (`mapa-agentes.py` -> `Mapa de mis agentes.html`)**: Generador determinista offline en Python (0 tokens) que analiza el repositorio y crea un mapa interactivo de skills, llamadas, flujos y kanban.
+- **Flujos Declarados (`00 Sistema/flujos.yml`)**: Especificación declarativa de pipelines con contratos de entrada y salida; incluye el flujo abierto de *Mantenimiento y Auditoría del Vault*.
+- **`Dashboard.md`**: Panel de navegación central en la raíz del vault para Obsidian.
+
 ## [0.6.0] — 2026-09-22
 
 Auditoría de la documentación. El README de la v0.5.0 era un buen ensayo y un manual difícil de
