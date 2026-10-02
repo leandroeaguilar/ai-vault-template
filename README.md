@@ -4,21 +4,23 @@
 [![licencia](https://img.shields.io/badge/código-MIT-green)](LICENSE)
 [![contenido](https://img.shields.io/badge/contenido-CC%20BY--NC--SA%204.0-lightgrey)](LICENSE-CONTENT)
 
-Una carpeta de notas en Markdown —un *vault*— con las guardas ya puestas para que la opere un
-agente de IA sin que eso sea un riesgo:
+Un sistema operativo agéntico para tus notas en Markdown —un *vault* de Obsidian— con las guardas
+deterministas ya puestas, estándar multi-agente universal y observabilidad visual offline:
 
 - **ningún secreto entra al historial**: se bloquea el commit, y también el PR;
 - **ningún comando peligroso se ejecuta**: se inspecciona antes, no después;
 - **lo que escribiste vos no lo reescribe un agente**: se marca y se verifica en cada commit;
 - **las tareas y recibos no pisan tu trabajo**: tablero Headless Kanban con validación humana;
-- **las mejoras del template te llegan** sin pisar una línea de tu contenido.
+- **observabilidad visual offline sin tokens**: mapa interactivo en HTML generado en local;
+- **estándar universal agnóstico**: skills compatibles con Claude Code, Codex, Antigravity y OpenCode;
+- **las mejoras del template te llegan** sin pisar una línea de tu contenido (`update.sh`).
 
-Todo eso corre con `bash` y `git`. Claude Code agrega comodidades, pero **no hace falta**: las
-guardas que importan viven en los hooks de git y en CI, donde no hay herramienta que valga.
+Todo eso corre con `bash`, `python3` y `git`. Claude Code agrega comodidades de sesión, pero **no hace
+falta**: las guardas que importan viven en los hooks de git y en CI, donde no hay harness que valga.
 
-**Qué no es:** no es una app ni un plugin de Obsidian, es un repositorio de git con hooks · no es
-un framework de agentes, no envuelve ningún modelo ni ninguna API · no opina sobre cómo tomás
-notas: impone un contrato de *metadatos*, no de método.
+**Qué no es:** no es una app cerrada ni un plugin de Obsidian, es un repositorio de git con hooks ·
+no es un framework pesado, no envuelve ningún modelo ni ninguna API de pago · no opina sobre cómo
+tomás notas: impone un contrato de *metadatos*, seguridad y flujos.
 
 📄 El porqué de cada decisión está en **[DECISIONES.md](DECISIONES.md)**.
 🔧 Rutas en duro, supuestos y whitelists, en **[REFERENCIA.md](REFERENCIA.md)**.
@@ -27,34 +29,36 @@ notas: impone un contrato de *metadatos*, no de método.
 
 ## 1. Qué obtenés
 
-```
+```text
 tu-vault/
 ├── 00 Sistema/           el contrato: SOPs, plantillas, flujos.yml, centinelas
 ├── 01 Index/             navegación: visión, objetivos, mapa personal
-├── 02 MOCs/              mapas temáticos
+├── 02 MOCs/              mapas temáticos (Map of Content)
 ├── 03 Proyectos/         iniciativas + Kanban/ (Pendientes, En_Progreso, Hecho)
 ├── 04 Knowledge/         conocimiento reutilizable
 ├── 05 Diario/            diario operativo + bitácora de agentes
-├── 06 Raw/               fuentes sin procesar
+├── 06 Raw/               fuentes originales sin procesar
 ├── 99 Archivo/           terminado o retirado
 │
 ├── .agents/              estándar universal: 5 skills agnósticas (AGENTS.md)
-├── .claude/              22 hooks, 3 commands, scripts deterministas
-├── .githooks/            pre-commit, pre-push
+├── .claude/              22 hooks, scripts deterministas y settings.json
+├── .githooks/            pre-commit, pre-push (gates locales)
 ├── .github/workflows/    los mismos gates, del lado del servidor
 ├── baseline-seguridad/   kit portable: llevás solo la seguridad a otro repo
 │
 ├── AGENTS.md             la ley común que lee cualquier agente antes de escribir
-├── Dashboard.md          panel de bienvenida y navegación en Obsidian
+├── Dashboard.md          panel de bienvenida y navegación central en Obsidian
 ├── Mapa de mis agentes   observabilidad visual interactiva (HTML offline, 0 tokens)
 ├── vault.conf            gobernanza: personal o equipo
 └── install.sh · update.sh · personalize.sh
 ```
 
-Las ocho carpetas numeradas son un pipeline, no un archivador: `06 Raw` → `04 Knowledge` →
-`02 MOCs` → `01 Index`, de crudo a navegable ([el porqué](<00 Sistema/Cómo funciona este vault.md>)).
-Lo que **no** viene es el método —cómo estudiar, cómo decidir, cómo revisar—: entra lo que ejecuta,
+Las ocho carpetas numeradas forman un pipeline de procesamiento, no un archivador estático:
+`06 Raw` → `04 Knowledge` → `02 MOCs` → `01 Index`, de crudo a navegable ([el porqué](<00 Sistema/Cómo funciona este vault.md>)).
+Lo que **no** viene es el método personal —cómo estudiar o qué metas ponerte—: entra lo que ejecuta,
 y lo que especifica lo que ejecuta.
+
+---
 
 ## 2. Requisitos
 
@@ -64,11 +68,14 @@ y lo que especifica lo que ejecuta.
 | `git` ≥ 2.9 | sí | los hooks no se activan (`core.hooksPath` existe desde 2.9) |
 | `python3` | en la práctica sí | los hooks que lo usan **dejan de bloquear**, en vez de romper la sesión |
 | `gh` (GitHub CLI) | no | el aviso de PRs sale en silencio y nadie se entera |
-| Obsidian + Templater | no | las 3 plantillas quedan con el tag de fecha literal |
-| Claude Code | no | los 9 hooks de `.claude/` quedan inertes; **el gate de git y el de CI siguen en pie** |
+| Obsidian | no | podés usar cualquier editor de Markdown; con Obsidian ganás navegación gráfica y [Dashboard.md](Dashboard.md) |
+| Cualquier Agente (Codex, Antigravity, OpenCode...) | no | leen `AGENTS.md` y ejecutan `.agents/skills/` directamente |
+| Claude Code | no | los hooks de evento de `.claude/` quedan inertes; **el gate de git, CI y las skills universales siguen en pie** |
 
-Esa última fila es la decisión de diseño más importante del repositorio, y está argumentada en
-[DECISIONES.md](DECISIONES.md).
+Esa última fila es la decisión de diseño más importante del repositorio: la gobernanza no depende de
+una suscripción ni de una herramienta privada ([DECISIONES.md §1](DECISIONES.md)).
+
+---
 
 ## 3. Instalación
 
@@ -104,20 +111,16 @@ git remote set-url origin https://github.com/<vos>/<tu-vault>.git
 | Windows | `core.longpaths true` | sin esto, un checkout con nombres largos falla |
 | Estado | crea `.vault-meta/` | marcas de sesión, locks y kill-switches; gitignorado |
 | Upstream | `git remote add upstream <url>` | el canal de actualizaciones, que `update.sh` exige |
-| Identidad | crea `owner.env` y, en la segunda corrida, corre `personalize.sh` | catorce `.md` se publican con el placeholder de owner literal |
+| Identidad | crea `owner.env` y corre `personalize.sh` | catorce `.md` se publican con el placeholder de owner literal |
 
-`owner.env` está **gitignoreado**: es identidad, y no viaja al clon de nadie. La gobernanza va en
-`vault.conf`, que sí se versiona (sección 6).
+Al abrir el vault en Obsidian, encontrarás **[Dashboard.md](Dashboard.md)** en la raíz como panel
+de bienvenida y navegación central.
 
-**Lo que ningún script puede hacer por vos.** Al terminar quedan tres stubs en `01 Index/`
-—`Vision`, `Objetivos`, `Mapa Personal`— en `estado: 🟡 Borrador`. Son la capa de orientación del
-vault. Llenalos a mano, o pedile `/onboarding` a un agente en esta carpeta: la skill te entrevista
-y los escribe con tus respuestas. Es **comodidad, no requisito**.
+---
 
 ## 4. Probalo en dos minutos
 
-Los tres comandos que demuestran que las guardas están encendidas. Corrélos ahora, no el día que
-las necesites.
+Los cinco comandos que demuestran que las guardas, el tablero y la observabilidad están encendidos:
 
 ```bash
 # 1. La guarda de secretos bloquea de verdad
@@ -129,17 +132,64 @@ git reset && rm fuga.txt
 echo '{"tool_name":"Bash","tool_input":{"command":"cat .env"}}' \
   | python3 .claude/hooks/security-guard.py ; echo "exit=$?"
 
-# 3. El auditor completo
+# 3. El auditor de seguridad completo
 bash .claude/hooks/security-audit.sh
+
+# 4. Creá una tarjeta en el tablero Headless Kanban
+python .claude/scripts/crear-tarea.py --titulo "Auditar enlaces rotos" --agent mantenedor --skill check-links
+
+# 5. Generá el mapa visual de tus agentes (0 tokens, abre en tu navegador)
+python .claude/scripts/mapa-agentes.py
 ```
 
-La clave de prueba se arma en runtime (`%s%s`) en vez de ir literal: si fuera literal, el propio
-`secret-scan` bloquearía el commit de este repositorio.
+---
 
-## 5. Qué corre y cuándo
+## 5. Tablero Headless Kanban y Patrón de Recibos
 
-**Harness:** `CC` = solo dentro de Claude Code. `todos` = cualquier agente, de cualquier harness, y
-los humanos también.
+El **Tablero Headless Kanban** (`03 Proyectos/Kanban/`) es el mecanismo de desacoplamiento entre vos
+y los agentes autónomos.
+
+En lugar de mantener un chat de 20.000 tokens esperando a que un agente termine, cualquier actor
+deposita una tarjeta markdown en `Pendientes/`.
+
+### El Principio: Los agentes proponen, los humanos deciden
+
+Un agente autónomo **nunca debe sobreescribir ni publicar directamente notas permanentes**. En su
+lugar, aplica el **Patrón de Recibos (Human-in-the-Loop)**:
+
+1. **El agente trabaja:** Genera el borrador en su ruta correspondiente.
+2. **Emite un recibo:** Crea una tarjeta con `--recibo` en `03 Proyectos/Kanban/Pendientes/` con el
+   enlace al diff o borrador.
+3. **Validación humana:** Revisás el entregable cuando tengas tiempo, aprobás el cambio y movés la
+   tarjeta a `Hecho/`.
+
+```bash
+# Crear un recibo de validación humana
+python .claude/scripts/crear-tarea.py --titulo "Revisar borrador propuesto" --agent general --recibo
+```
+
+---
+
+## 6. Observabilidad Visual (`Mapa de mis agentes`)
+
+Tener agentes y skills no sirve de nada si no sabes qué tenés instalado ni qué corre en segundo
+plano.
+
+El script `.claude/scripts/mapa-agentes.py` hace análisis estático determinista del repositorio y
+genera **`Mapa de mis agentes.html`**:
+
+- **Cero Tokens / 100% Offline:** No consume APIs de pago ni envía un solo byte fuera de tu máquina.
+- **Grafo interactivo:** Visualiza quién llama a quién, qué skills existen en `.agents/skills/`,
+  qué comandos tenés disponibles y qué flujos están declarados en `00 Sistema/flujos.yml`.
+- **Cola Kanban en vivo:** Muestra en qué estado están tus tareas pendientes.
+- **Uso:** Hacé doble clic sobre `Mapa de mis agentes.html` para abrirlo en cualquier navegador.
+
+---
+
+## 7. Qué corre y cuándo
+
+**Harness:** `CC` = solo dentro de Claude Code. `todos` = cualquier agente (Codex, Antigravity,
+Claude Code, OpenCode) y humanos.
 
 | Pieza | Se dispara con | Harness | Kill-switch (`.vault-meta/…`) |
 |---|---|---|---|
@@ -151,8 +201,12 @@ los humanos también.
 | `sentinels-guard.sh` + `.py` | antes de `Write`/`Edit` | CC | `sentinels.disabled` |
 | `security-guard.sh` + `.py` | antes de `Bash`/`Read` | CC | `security-guard.disabled` |
 | `auto-commit.sh` | después de `Write`/`Edit` | CC | `autocommit.disabled` |
-| `agent-diary.sh` | cierre de sesión | CC | `diary.disabled` |
-| `check-diary-size.sh` | lo llama `agent-diary.sh` | CC | `diary-cap.disabled` |
+| `agent-diary` (`.agents/skills/`) | cierre de sesión | todos | `diary.disabled` |
+| `check-diary-size.sh` | lo llama `agent-diary` | CC | `diary-cap.disabled` |
+| `check-links` (`.agents/skills/`) | bajo demanda / mantenimiento | todos | — |
+| `verifier` (`.agents/skills/`) | antes de `git commit` (self-review) | todos | — |
+| `security-audit` (`.agents/skills/`) | bajo demanda / auditoría | todos | — |
+| `crear-tarea` (`.agents/scripts/`) | creación de tareas y recibos | todos | — |
 | gate de rama | `git commit` | todos | `branch-gate.disabled` |
 | `secret-scan.sh` | `git commit` + CI | todos | `secret-scan.disabled` |
 | `sentinels-verify.py` | `git commit` + CI | todos | `sentinels.disabled` |
@@ -161,27 +215,14 @@ los humanos también.
 | `.githooks/pre-push` | `git push` | todos | `prepush.disabled` |
 | `verify.yml` · `aviso-de-pr.yml` | Pull Request | todos | desactivar el workflow |
 
-> **Los kill-switches no siguen el nombre del archivo.** `agent-diary.sh` se apaga con
-> `diary.disabled`; los tres centinelas comparten `sentinels.disabled`. Usá la columna de esta
-> tabla: está verificada contra el código, no deducida del nombre.
+---
 
-Al abrir una sesión con Claude Code vas a ver cuatro avisos seguidos: son esos cuatro primeros
-hooks. Y al cerrarla, si tocaste algo, el cierre **queda bloqueado** hasta que el agente deje su
-entrada de handoff en `05 Diario/Bitácora Agentes/`. Ninguna de las dos cosas es un cuelgue.
-
-**Lo que se invoca desde el agente** (solo Claude Code): `/onboarding` para inicializar el vault,
-`/revisar-seguridad` para auditar algo antes de instalarlo o abrirlo, `/revisar-pr` para traducir
-un PR a lenguaje de vault, y el subagente `verifier` como segunda opinión sobre el diff staged.
-Los cuatro proponen: ninguno aprueba, mergea ni ejecuta lo que está auditando.
-
-Los comandos que se corren a mano están en [REFERENCIA.md](REFERENCIA.md).
-
-## 6. Configuración
+## 8. Configuración
 
 | Archivo | Qué es | ¿Se versiona? |
 |---|---|---|
 | `owner.env` | Identidad: `OWNER`, `OWNER_EMAIL`, `OWNER_GITHUB` | **no** (gitignoreado) |
-| `vault.conf` | Gobernanza: `VAULT_MODE`, `MAIN_BRANCH`, `TEAM_MEMBERS`, `ROUTINES_EXPECTED` | **sí** |
+| `vault.conf` | Gobernanza: `VAULT_MODE`, `MAIN_BRANCH`, `TEAM_MEMBERS` | **sí** |
 | `.vault-meta/*.disabled` | Kill-switches, uno por guarda | no |
 
 **Si lo van a usar varias personas**, editá `vault.conf` y commiteálo:
@@ -193,28 +234,11 @@ TEAM_MEMBERS="Ana,Beto"
 ```
 
 ⚠️ Con `VAULT_MODE=equipo`, **todo commit sobre `main` queda bloqueado**. La salida es
-`git switch -c <prefijo>/<tema>`, o `--no-verify` para una excepción puntual. El modo también
-enciende el aviso de PRs y hace que el auto-commit se abstenga en la rama principal.
+`git switch -c <prefijo>/<tema>`, o `--no-verify` para una excepción puntual.
 
-El modo vive en `vault.conf` y no en `owner.env` porque `owner.env` no viaja: ahí, el gate de rama
-de la segunda persona nacería inerte. Y `vault.conf` se **parsea, nunca se sourcea** —un `source`
-convertiría un PR a este archivo en ejecución de código en la máquina de cada persona—, así que
-**un comentario va en su propia línea**, nunca al final de un valor.
+---
 
-**Apagar una guarda, o endurecer el verifier:**
-
-```bash
-touch .vault-meta/diary.disabled        # apaga agent-diary.sh
-touch .vault-meta/verifier.strict       # el verifier BLOQUEA en vez de avisar
-```
-
-Por defecto el verifier es **warn-only**: te avisa qué campo de frontmatter falta y deja pasar el
-commit. En CI el equivalente de `strict` es `VERIFIER_STRICT: "1"` en el workflow.
-
-**No toques `.gitattributes` sin leerlo.** `*.sh text eol=lf` es infraestructura crítica en
-Windows: con CRLF, el shebang rompe la ejecución en Git Bash y los hooks no arrancan.
-
-## 7. Actualizarse
+## 9. Actualizarse
 
 ```bash
 ./update.sh --check      # ¿hay versión nueva? No toca nada
@@ -222,65 +246,56 @@ Windows: con CRLF, el shebang rompe la ejecución en Git Bash y los hooks no arr
 ./update.sh              # interactivo: lista y pide confirmación
 ```
 
-Requiere el remote `upstream`, que `install.sh` cablea solo. Un `git merge` no serviría —las
-instancias divergen desde el primer día y el merge daría conflictos en archivos que nadie quiso
-tocar—, así que el updater copia por whitelist, con tres clases:
+El updater copia por whitelist en tres clases:
 
 | Clase | Qué es | Qué hace el update |
 |---|---|---|
-| `infrastructure` | Hooks, scripts, workflows, `00 Sistema/`, `baseline-seguridad/`, docs del template | se sobrescribe siempre |
-| `scaffold` | `owner.env`, `vault.conf`, `FIRST_RUN.md`, los 3 stubs de `01 Index/` | se instala una vez y **nunca** se pisa |
-| contenido | todo lo demás | no se toca jamás |
+| `infrastructure` | Hooks, skills `.agents/**`, scripts, workflows, `00 Sistema/`, `baseline-seguridad/`, docs | se sobrescribe siempre |
+| `scaffold` | `owner.env`, `vault.conf`, `FIRST_RUN.md`, `Dashboard.md`, stubs de `01 Index/`, Kanban | se instala una vez y **nunca** se pisa |
+| contenido | todo lo demás (tus notas, proyectos, diario, MOCs) | no se toca jamás |
 
-Un archivo **tuyo** dentro de una ruta de framework (un SOP propio en `00 Sistema/`) se detecta
-porque no existe upstream: se lista aparte y no se toca.
+---
 
-## 8. Adaptarlo a tu repo
+## 10. Adaptarlo a tu repo
 
-**(a) Querés un vault entero.** Seguí la sección 3. Es el camino soportado.
+**(a) Querés un vault entero.** Seguí la sección 3. Es el camino recomendado.
 
 **(b) Querés solo la seguridad, en un repo de código.** Usá
 [`baseline-seguridad/`](<baseline-seguridad/README.md>): siete archivos copiables y autocontenidos
-con las capas 1 a 3, su propio README con los cinco pasos, y el bloque que pegás en el `CLAUDE.md`
-del proyecto destino. No necesita las ocho carpetas ni el verifier.
+con las capas 1 a 3 para tu proyecto.
 
-> **Lo que no hay que hacer** es copiar `.claude/` + `.githooks/` sueltos a otro repo: te llevás
-> los hooks sin el contrato que aplican, sin `AGENTS.md`, sin `vault.conf` y sin canal de
-> actualizaciones.
+**(c) Querés los hooks sobre tu propia estructura.** Se puede; las rutas en duro están documentadas
+en [REFERENCIA.md](REFERENCIA.md).
 
-**(c) Querés los hooks sobre tu propia estructura de carpetas.** Se puede, pero es trabajo manual:
-hay nueve archivos con rutas en duro. La lista y el orden sugerido para reescribirlas están en
-[REFERENCIA.md](REFERENCIA.md).
+---
 
-## 9. Límites y licencia
+## 11. Límites y licencia
 
-El guard de comandos hace pattern matching sobre el texto, así que produce falsos positivos: un
-script que solo *menciona* un archivo de credenciales queda bloqueado igual. Es el intercambio
-elegido a propósito. Lo que asume cada hook está en [REFERENCIA.md](REFERENCIA.md).
-
-Doble licencia, **por ruta** (no por extensión, para que un `.md` dentro de `.claude/` no caiga en
-las dos a la vez):
+Doble licencia, **por ruta**:
 
 | Rutas | Licencia |
 |---|---|
-| `.claude/**`, `.githooks/**`, `.github/**`, `baseline-seguridad/**`, `*.sh`, `*.py`, `*.yml`, `vault-manifest.json`, `vault.conf`, `owner.env.example`, `VERSION`, `.gitignore`, `.gitattributes` | [MIT](LICENSE) |
+| `.agents/**`, `.claude/**`, `.githooks/**`, `.github/**`, `baseline-seguridad/**`, `*.sh`, `*.py`, `*.yml`, `Mapa de mis agentes.html`, `vault-manifest.json`, `vault.conf`, `owner.env.example`, `VERSION`, `.gitignore`, `.gitattributes` | [MIT](LICENSE) |
 | Los `.md` **fuera** de esas rutas: `00 Sistema/**`, `05 Diario/**`, `AGENTS.md`, `README.md`, `DECISIONES.md`, `REFERENCIA.md`, `CHANGELOG.md`, y la arquitectura de carpetas | [CC BY-NC-SA 4.0](LICENSE-CONTENT) |
 
-Las skills, el subagente y los README dentro de rutas MIT son **MIT**: son piezas ejecutables,
-aunque estén escritas en Markdown. En caso de duda sobre un archivo no listado, rige
-CC BY-NC-SA 4.0. Historial de versiones en [CHANGELOG.md](CHANGELOG.md).
+Historial de versiones en [CHANGELOG.md](CHANGELOG.md).
+
+---
 
 ## Glosario
 
 | Término | Qué significa acá |
 |---|---|
 | **vault** | La carpeta de notas en Markdown, con su estructura y su contrato. No es una base de datos ni una app |
-| **harness** | La herramienta desde la que corre el agente (Claude Code, Codex, otra). Un control que solo vive en un harness protege solo mientras uses ese harness |
+| **harness** | La herramienta desde la que corre el agente (Claude Code, Codex, Antigravity, OpenCode). Un control que solo vive en un harness protege solo mientras uses ese harness |
 | **centinela** | Marca `<!-- @user -->` / `<!-- @generated -->` que declara qué bloque de un documento es tuyo y cuál puede regenerar el sistema |
-| **gate** · **guarda** | Chequeo que puede **bloquear** una acción —un commit, un push, un comando—, a diferencia de un aviso |
-| **fail-open** | Si a la guarda le falta una dependencia, deja pasar en vez de romper. Frenar tu trabajo por una causa ajena sale más caro |
-| **warn-only** | El chequeo avisa pero no bloquea. Es el modo por defecto del verifier |
-| **infrastructure** · **scaffold** | Las dos clases de la whitelist del updater: lo primero se sobrescribe siempre, lo segundo se instala una vez y nunca se pisa |
-| **upstream** | El remote de git que apunta al template. Es el canal por el que llegan las actualizaciones |
+| **gate** · **guarda** | Chequeo determinista que puede **bloquear** una acción (un commit, un push, un comando) si viola una política de seguridad |
+| **Headless Kanban** | Tablero asíncrono de tarjetas Markdown en `03 Proyectos/Kanban/` para delegar tareas a agentes sin mantener sesiones de chat abiertas |
+| **recibo** | Tarjeta de tarea emitida por un agente tras generar un borrador para que el humano apruebe antes de tocar el documento final |
+| **Mapa de agentes** | Interfaz HTML interactiva offline generada con 0 tokens de LLM que refleja el grafo de dependencias y estado de tus agentes |
+| **fail-open** | Si a la guarda le falta una dependencia, deja pasar en vez de romper la sesión de trabajo |
+| **warn-only** | El chequeo avisa pero no bloquea (modo por defecto del verifier) |
+| **infrastructure** · **scaffold** | Las dos clases de la whitelist del updater: lo primero se sobrescribe con updates, lo segundo se instala una vez y nunca se pisa |
+| **upstream** | El remote de git que apunta al template original para recibir mejoras |
 
 © 2026 Leandro Esteban Aguilar Montilla.
