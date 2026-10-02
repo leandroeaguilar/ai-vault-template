@@ -23,7 +23,7 @@ Si no existe `FIRST_RUN.md` en la raíz, el onboarding ya se hizo. Decilo, ofrec
        OWNER_EMAIL="..."
        OWNER_GITHUB="..."
 
-   Después corré `./install.sh`. Retoma solo desde ahí: cablea los hooks si faltaban, engancha el remote `upstream` y corre `personalize.sh`, que reemplaza el placeholder de owner en los once `.md` que lo traen (las tres plantillas, cuatro docs de `00 Sistema/`, el doc de la bitácora, las dos skills y el subagente). Es idempotente.
+   Después corré `./install.sh`. Retoma solo desde ahí: cablea los hooks si faltaban, engancha el remote `upstream` y corre `personalize.sh`, que reemplaza el placeholder de owner en los catorce `.md` que lo traen (las tres plantillas, cuatro docs de `00 Sistema/`, el doc de la bitácora, los tres stubs de `01 Index/`, las dos skills y el subagente). Es idempotente.
 
    > Ojo con el token: en prosa se escribe con espacios internos —`{{ OWNER }}`— justamente para que `personalize.sh` no lo reemplace. Si ves el token con espacios en un documento, **no lo "corrijas"**: es funcional. Ver `SOP Documentación` §6.
 

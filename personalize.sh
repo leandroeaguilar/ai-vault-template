@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
 # Reemplaza los placeholders de owner ({{ OWNER }}, {{ OWNER_EMAIL }},
-# {{ OWNER_GITHUB }}) usando owner.env.
+# {{ OWNER_GITHUB }}) usando owner.env. Idempotente.
 #
-# Idempotente. Lo encadena install.sh, y update.sh lo re-corre tras cada
-# actualizacion para resolver los placeholders de los archivos nuevos.
-#
-# NO hace falta correrlo a mano: es el paso 5 de install.sh. Se deja invocable
-# por separado porque update.sh lo necesita asi.
+# NO hace falta correrlo a mano: lo encadena install.sh. Queda invocable por
+# separado porque update.sh lo re-corre tras cada actualizacion, para resolver
+# los placeholders de los archivos nuevos.
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -26,12 +24,8 @@ fi
 source ./owner.env
 : "${OWNER:?owner.env sin OWNER=}"
 
-# NOTA: hasta la v0.4.0 aca habia un guard que ABORTABA si existia FIRST_RUN.md y
-# mandaba a correr /onboarding — un comando que este repositorio no traia. Era un
-# callejon sin salida para quien instalaba a mano. Se saco por principio, no por
-# comodidad: el camino de shell es CANONICO, no un plan B. Esta plantilla tiene
-# que poder instalarse sin ningun agente, igual que sus guardas tienen que correr
-# sin ningun harness. Quien avisa de lo que falta ahora es install.sh, al final.
+# No hay guard contra FIRST_RUN.md: personalizar a mano tiene que poder hacerse
+# sin ningun agente. De lo que falta al terminar avisa install.sh.
 
 # sed -i NO es portable: GNU no lleva sufijo, BSD/macOS lo exige. Se evita del todo
 # reescribiendo cada archivo via temp-file (funciona igual en Linux, macOS y Git-Bash).

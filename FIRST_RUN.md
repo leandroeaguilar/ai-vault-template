@@ -15,7 +15,7 @@ Después llená a mano los tres stubs de `01 Index/` (Vision, Objetivos, Mapa Pe
 como están, el sistema funciona igual.
 
 > Si `./install.sh` te dice que `origin` apunta al template, **forkeá primero**: es el paso 1 y
-> sin él tu primer `git push` va a quedar bloqueado. Está explicado en el README §3.1.
+> sin él tu primer `git push` va a quedar bloqueado. Está explicado en el README, sección 3.
 
 ## Con un agente (guiado)
 
@@ -34,5 +34,5 @@ de que lo escribas vos.
 
 ---
 
-Cuando termines, seguí por el [README](<README.md>) — §4 "Probalo en dos minutos" y §5 "Tu
-primera sesión".
+Cuando termines, seguí por el [README](<README.md>): la sección 4, "Probalo en dos minutos", y la
+5, "Qué corre y cuándo".

@@ -1,8 +1,8 @@
 {
   "template": "ai-vault-template",
   "upstream": "https://github.com/leandroeaguilar/ai-vault-template.git",
-  "version": "0.5.0",
-  "released": "2026-09-20",
+  "version": "0.6.0",
+  "released": "2026-09-22",
   "description": "Guardas, hooks y CI para operar un repositorio de notas con agentes de IA. Seguridad determinista en 4 capas (deny en settings.json, security-guard en PreToolUse, secret-scan en pre-commit, security-audit), centinelas @user/@generated, verifier pre-commit e índices index.md generados. Incluye el vault mínimo que esos hooks asumen: las 8 capas, 3 plantillas y los SOPs que especifican el contrato que el verifier aplica. Gate de git agnóstico de harness: los centinelas y el bloqueo de reescritura de historia corren para cualquier agente, no solo Claude Code.",
   "infrastructure": [
     ".claude/**",
@@ -23,6 +23,8 @@
     "AGENTS.md",
     "CHANGELOG.md",
     "README.md",
+    "DECISIONES.md",
+    "REFERENCIA.md",
     "VERSION",
     "vault-manifest.json",
     "install.sh",

@@ -5,10 +5,10 @@
 # completaste owner.env, deja el archivo listo y sale; volves a correrlo y sigue
 # desde ahi. Por eso la instalacion son dos comandos y no seis pasos manuales.
 #
-# Este script corre en DOS contextos distintos y tiene que distinguirlos:
+# Corre en DOS contextos distintos y tiene que distinguirlos:
 #   - el checkout del MANTENEDOR del template (origin ES el template);
 #   - el clon de quien INSTALA (origin es su propio fork).
-# Ver el bloque del remote upstream, mas abajo.
+# La variable ES_TEMPLATE es la que decide.
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -27,16 +27,12 @@ mkdir -p .vault-meta
 echo "✓ .vault-meta/ (estado local, no se versiona)"
 
 # ── Remote upstream: el canal por el que llegan las actualizaciones ──────────
-# update.sh y update-notice.sh lo EXIGEN. Que no lo cableara este script era el
-# agujero del procedimiento: update.sh abortaba diciendo "corre ./install.sh",
-# que es justo lo que no lo agregaba.
+# update.sh y update-notice.sh lo EXIGEN.
 #
-# La URL se declara UNA sola vez, en vault-manifest.json, y se lee de ahi.
-# Hardcodearla aca —ademas del regex de familia de .githooks/pre-push— repetiria
-# el incidente de la v0.3.0: el repo se renombro, nadie actualizo el nombre
-# hardcodeado y el guard quedo como codigo muerto un release entero. El regex de
-# pre-push se queda donde esta porque es otra cosa: tiene que seguir matcheando
-# los nombres VIEJOS de la familia, no la URL canonica de hoy.
+# La URL se declara UNA sola vez, en vault-manifest.json, y se lee de ahi: un
+# rename del repo no puede dejar aca un nombre viejo como codigo muerto. El regex
+# de familia de pre-push es otra cosa y se queda donde esta: tiene que seguir
+# matcheando los nombres VIEJOS, no la URL canonica de hoy.
 TEMPLATE_URL="$(sed -n 's/.*"upstream"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' vault-manifest.json 2>/dev/null | head -1)"
 FAMILIA='ai-vault-template|sistema-maestro-(pro|template|toolkit)'
 ORIGIN_URL="$(git remote get-url origin 2>/dev/null || echo '')"
@@ -62,13 +58,13 @@ else
 fi
 
 # ── Identidad: owner.env + resolucion de placeholders ───────────────────────
-# Once archivos .md se publican con el placeholder de owner literal. Sin este
+# Catorce archivos .md se publican con el placeholder de owner literal: sin
 # paso quedan sin resolver el frontmatter de las plantillas y el prompt de las
-# skills. Por eso el instalador lo encadena en vez de confiar en que lo leas.
+# skills. Por eso se encadena aca en vez de quedar como un paso manual.
 #
 # Con origin apuntando al template, este paso NO corre, y es deliberado:
 #   - En el checkout del MANTENEDOR, crear owner.env seria destructivo: es
-#     justamente su ausencia lo que .githooks/pre-push usa para reconocerlo.
+#     justamente su ausencia lo que el guard de pre-push usa para reconocerlo.
 #     Con owner.env presente, el mantenedor se bloquearia sus propios push.
 #   - Y a quien CLONO en vez de forkear le conviene arreglar origin ANTES de
 #     personalizar: si personaliza primero, se lleva la sorpresa en el push.
@@ -92,12 +88,12 @@ if [ ! -f owner.env ]; then
 
 → Falta un paso, y es tuyo: completá owner.env (OWNER, OWNER_EMAIL, OWNER_GITHUB).
 
-   Ya te dejé el archivo creado a partir del ejemplo. Cuando lo llenes:
+   El archivo ya quedó creado a partir de owner.env.example. Una vez completo:
 
      ./install.sh          # retoma desde acá y resuelve los placeholders
 
-   ¿Preferís que te lo pregunte un agente y de paso llene tu 01 Index?
-   Abrí esta carpeta con Claude Code y pedí:  /onboarding
+   Alternativa guiada: abrí esta carpeta con Claude Code y pedí /onboarding.
+   Te lo pregunta, y de paso llena los stubs de 01 Index/.
 MSG
   exit 0
 fi
@@ -105,7 +101,7 @@ fi
 bash ./personalize.sh
 
 # La instancia ya esta inicializada: el cartel de primera vez sobra.
-# if/then y no `[ -f x ] && rm x`: con `set -e`, esa lista devuelve 1 cuando la
+# if/then y NO `[ -f x ] && rm x`: con `set -e`, esa lista devuelve 1 cuando la
 # condicion es falsa y aborta el script justo en el caso normal.
 if [ -f FIRST_RUN.md ]; then
   rm -f FIRST_RUN.md

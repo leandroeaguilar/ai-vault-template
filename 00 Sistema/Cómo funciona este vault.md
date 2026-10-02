@@ -121,7 +121,8 @@ uno a uno:
 | Lo que escribiste vos no se pisa | centinelas `@user` / `@generated` |
 | Nada de secretos en la historia | `secret-scan.sh` |
 
-El detalle de cada una está en el [README](<../README.md>).
+Qué hace cada una está en el [README](<../README.md>); por qué está hecha así, en
+[DECISIONES](<../DECISIONES.md>).
 
 ---
 
@@ -141,7 +142,7 @@ Lo que sí corresponde a este documento es **qué hacer después**, cuando la ma
    frenarte: es warn-only por defecto, porque la regla del sistema es que el frontmatter se
    normaliza *al tocar* un documento, no en una migración retroactiva el día uno. Ese aviso es la
    señal de que está andando. Si querés que además bloquee:
-   `touch .vault-meta/verifier.strict` (README §10.3).
+   `touch .vault-meta/verifier.strict` (README, sección 6).
 
 Lo que este repositorio **no** trae es el método: cómo estudiar, cómo decidir, cómo revisar, cómo
 construir carrera encima de esto. Eso es contenido de cada quien, y la plantilla está hecha para no

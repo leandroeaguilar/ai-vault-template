@@ -9,6 +9,37 @@ contra el del upstream para decidir si una instancia está atrasada — por eso 
 
 ---
 
+## [0.6.0] — 2026-09-22
+
+Auditoría de la documentación. El README de la v0.5.0 era un buen ensayo y un manual difícil de
+seguir: 5.380 palabras (~25 minutos), con la jerga propia apareciendo en la línea 11 y
+definiéndose en la 279, catorce remisiones internas que obligaban a leer salteado, y ninguna
+imagen del resultado. Esta versión separa los tres documentos que estaban mezclados en uno.
+
+### Agregado
+- **`DECISIONES.md`** — el ensayo de diseño, íntegro y ahora legible solo: las cuatro capas de
+  seguridad y la quinta falible, el reparto harness/git, el verifier, las guardas de `pre-push`,
+  la continuidad entre sesiones y el CI.
+- **`REFERENCIA.md`** — lo que hace falta para *modificar* la plantilla: comandos manuales, qué
+  carpeta nombra en duro cada hook, qué asume cada uno, las dos whitelists y los cabos sueltos.
+- **Glosario** al pie del README: `vault`, `harness`, centinela, gate, fail-open, warn-only,
+  `infrastructure`/`scaffold` y `upstream`. Los ocho términos aparecían antes de tener definición.
+- **Árbol de carpetas** en el README. La pregunta "¿qué me llevo?" no tenía respuesta visual.
+
+### Cambiado
+- **README reescrito como manual**: de 5.380 a ~2.250 palabras (−58%), de trece secciones a nueve
+  más el glosario. Nada se borró: el ensayo y la referencia se mudaron a los dos archivos de
+  arriba, y la narración histórica ya vivía en este changelog.
+- **Los comentarios de `install.sh`, `personalize.sh` y `update.sh` explican el código, no la
+  sesión en que se escribieron.** Contaban qué había antes de la v0.4.0 y qué incidente motivó
+  cada línea —material de commit, y de hecho ya está en los commits—. Se quedan los que evitan
+  una regresión: por qué `sed -i` no es portable, por qué `if/then` y no `[ -f x ] && rm x` con
+  `set -e`, por qué `ls-tree` y no `cat-file` en Git Bash. Ninguna lógica cambió: lo único
+  ejecutable que se tocó es la whitelist de `update.sh`, para que los dos documentos nuevos
+  viajen a las instancias.
+- **`install.sh` dejó de hablar en primera persona.** Decía "Ya te dejé el archivo creado", como
+  si lo hubiera escrito un asistente; el resto del script es impersonal.
+
 ## [0.5.0] — 2026-09-20
 
 El procedimiento de instalación documentado dejaba la instancia a medias. La causa no eran tres
