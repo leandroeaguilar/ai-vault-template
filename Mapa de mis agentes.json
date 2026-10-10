@@ -1,6 +1,6 @@
 {
  "version": "0.1",
- "generado": "2026-10-02 17:07",
+ "generado": "2026-10-10 13:29",
  "skills": [
   {
    "nombre": "agent-diary",
@@ -10,7 +10,7 @@
    "palabras": 240,
    "kb": 1.6,
    "modificado": "2026-10-02",
-   "dias": 0,
+   "dias": 8,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": true,
@@ -58,7 +58,7 @@
    "palabras": 1490,
    "kb": 10.1,
    "modificado": "2026-09-23",
-   "dias": 9,
+   "dias": 17,
    "es_agente": true,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -78,7 +78,7 @@
      {
       "que": "benchmark.json",
       "nivel": "declarado",
-      "por": "1. Read the benchmark.json containing all run results"
+      "por": "- **benchmark_data_path**: Path to the in-progress benchmark.json with all run r"
      },
      {
       "que": "10 and note specific issues",
@@ -88,9 +88,50 @@
     ],
     "salidas": [
      {
-      "que": "benchmark.json",
+      "que": "un texto nuevo (sitio sin declarar)",
+      "nivel": "supuesto",
+      "por": "por el tipo de skill"
+     }
+    ],
+    "herramientas": [],
+    "opaca": false
+   }
+  },
+  {
+   "nombre": "built-in-browser",
+   "ruta": "~/.claude/skills/synced/b510fdee-d1fa-4db9-911d-d23dc5421ebc_07dd9d7f-fea1-476c-a3aa-1005fe7607aa/built-in-browser/SKILL.md",
+   "herramienta": "Claude Code",
+   "descripcion": "Read this skill before the first step that uses the built-in browser, the browser pane inside the Claude desktop app (also called the in-app browser, the browser pane, Claude's browser, or \\\"your own browser\\\"), whose to",
+   "palabras": 1043,
+   "kb": 6.4,
+   "modificado": "2026-10-07",
+   "dias": 3,
+   "es_agente": false,
+   "tiene_ejemplos": true,
+   "tiene_cuando": false,
+   "privado": false,
+   "ejemplo": false,
+   "es_local": false,
+   "herramientas": [
+    "Claude Code"
+   ],
+   "rutas": [
+    "~/.claude/skills/synced/b510fdee-d1fa-4db9-911d-d23dc5421ebc_07dd9d7f-fea1-476c-a3aa-1005fe7607aa/built-in-browser/SKILL.md"
+   ],
+   "copias_count": 1,
+   "es": {
+    "entradas": [
+     {
+      "que": "lo que le digas en la conversación",
+      "nivel": "supuesto",
+      "por": "no declara nada: se le pasa por chat"
+     }
+    ],
+    "salidas": [
+     {
+      "que": "LICENSE.txt",
       "nivel": "declarado",
-      "por": "- **benchmark_data_path**: Path to the in-progress benchmark.json with all run r"
+      "por": "license: Proprietary. LICENSE.txt has complete terms"
      }
     ],
     "herramientas": [],
@@ -102,9 +143,9 @@
    "ruta": ".agents/skills/check-links/SKILL.md",
    "herramienta": "Gemini / Antigravity",
    "descripcion": "Detecta y propone corrección de enlaces rotos, wikilinks desalineados o notas huérfanas en el vault.",
-   "palabras": 177,
-   "kb": 1.3,
-   "modificado": "2026-10-02",
+   "palabras": 197,
+   "kb": 1.4,
+   "modificado": "2026-10-10",
    "dias": 0,
    "es_agente": false,
    "tiene_ejemplos": true,
@@ -159,14 +200,60 @@
     ],
     "salidas": [
      {
-      "que": "solo una respuesta en el chat: no deja nada escrito",
-      "nivel": "supuesto",
-      "por": "no declara ninguna salida"
+      "que": "00 Sistema",
+      "nivel": "declarado",
+      "por": "- Con `heal-links.py`, corrige los enlaces dentro de las notas de `00 Sistema/` "
+     },
+     {
+      "que": "06 Raw",
+      "nivel": "declarado",
+      "por": "- Con `heal-links.py`, corrige los enlaces dentro de las notas de `00 Sistema/` "
      }
     ],
     "herramientas": [
      "Python"
     ],
+    "opaca": false
+   }
+  },
+  {
+   "nombre": "chrome-browser",
+   "ruta": "~/.claude/skills/synced/b510fdee-d1fa-4db9-911d-d23dc5421ebc_07dd9d7f-fea1-476c-a3aa-1005fe7607aa/chrome-browser/SKILL.md",
+   "herramienta": "Claude Code",
+   "descripcion": "Read this skill before the first step that uses Claude in Chrome, the browser extension whose tools are named mcp__claude-in-chrome__* (also called Chrome, the browser extension, or the external browser) and which acts i",
+   "palabras": 886,
+   "kb": 5.7,
+   "modificado": "2026-10-07",
+   "dias": 3,
+   "es_agente": false,
+   "tiene_ejemplos": true,
+   "tiene_cuando": true,
+   "privado": false,
+   "ejemplo": false,
+   "es_local": false,
+   "herramientas": [
+    "Claude Code"
+   ],
+   "rutas": [
+    "~/.claude/skills/synced/b510fdee-d1fa-4db9-911d-d23dc5421ebc_07dd9d7f-fea1-476c-a3aa-1005fe7607aa/chrome-browser/SKILL.md"
+   ],
+   "copias_count": 1,
+   "es": {
+    "entradas": [
+     {
+      "que": "console.log",
+      "nivel": "declarado",
+      "por": "3. Claude can use `mcp__claude-in-chrome__javascript_tool` to check for and dism"
+     }
+    ],
+    "salidas": [
+     {
+      "que": "LICENSE.txt",
+      "nivel": "declarado",
+      "por": "license: Proprietary. LICENSE.txt has complete terms"
+     }
+    ],
+    "herramientas": [],
     "opaca": false
    }
   },
@@ -178,7 +265,7 @@
    "palabras": 991,
    "kb": 7.1,
    "modificado": "2026-09-23",
-   "dias": 9,
+   "dias": 17,
    "es_agente": true,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -218,11 +305,11 @@
    "nombre": "computer-use",
    "ruta": "~/.claude/skills/computer-use/SKILL.md",
    "herramienta": "Claude Code",
-   "descripcion": ">-",
+   "descripcion": "Read this skill before the first step of any request to do something in an app on the person's own computer (Notes, Finder, System Settings, any desktop app), to look at their screen, or for \\\"computer use\\\". Computer us",
    "palabras": 338,
    "kb": 2.2,
-   "modificado": "2026-09-23",
-   "dias": 9,
+   "modificado": "2026-10-08",
+   "dias": 2,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -235,9 +322,10 @@
    ],
    "rutas": [
     "~/.claude/skills/computer-use/SKILL.md",
+    "~/.claude/skills/synced/b510fdee-d1fa-4db9-911d-d23dc5421ebc_07dd9d7f-fea1-476c-a3aa-1005fe7607aa/computer-use/SKILL.md",
     "~/.agents/skills/computer-use/SKILL.md"
    ],
-   "copias_count": 2,
+   "copias_count": 3,
    "es": {
     "entradas": [
      {
@@ -265,7 +353,7 @@
    "palabras": 206,
    "kb": 1.6,
    "modificado": "2026-10-02",
-   "dias": 0,
+   "dias": 8,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": true,
@@ -282,18 +370,6 @@
    "es": {
     "entradas": [
      {
-      "que": "/../../00 Sistema/001_plantillas/Plantilla Tarjeta Kanban.md",
-      "nivel": "inferido",
-      "por": "ruta nombrada sin verbo: - **Plantilla base:** [Plantilla Tarjeta Kanban](<../.."
-     }
-    ],
-    "salidas": [
-     {
-      "que": "03 Proyectos/Kanban/Pendientes",
-      "nivel": "declarado",
-      "por": "description: Crea una tarjeta de tarea en el tablero Headless Kanban (03 Proyect"
-     },
-     {
       "que": "06 Raw",
       "nivel": "declarado",
       "por": "- **Ruta de origen:** Archivo de insumo en `06 Raw/` o `04 Knowledge/`."
@@ -302,6 +378,18 @@
       "que": "04 Knowledge",
       "nivel": "declarado",
       "por": "- **Ruta de origen:** Archivo de insumo en `06 Raw/` o `04 Knowledge/`."
+     },
+     {
+      "que": "/../../00 Sistema/001_plantillas/Plantilla Tarjeta Kanban.md",
+      "nivel": "declarado",
+      "por": "- **Plantilla base:** [Plantilla Tarjeta Kanban](<../../../00 Sistema/001_planti"
+     }
+    ],
+    "salidas": [
+     {
+      "que": "03 Proyectos/Kanban/Pendientes",
+      "nivel": "declarado",
+      "por": "description: Crea una tarjeta de tarea en el tablero Headless Kanban (03 Proyect"
      },
      {
       "que": "03 Proyectos/Kanban/Pendientes/AAAA-MM-DD",
@@ -321,6 +409,97 @@
    }
   },
   {
+   "nombre": "deep-research",
+   "ruta": "~/.claude/skills/synced/b510fdee-d1fa-4db9-911d-d23dc5421ebc_07dd9d7f-fea1-476c-a3aa-1005fe7607aa/deep-research/SKILL.md",
+   "herramienta": "Claude Code",
+   "descripcion": "Use this skill when the user's prompt requires (1) researching a topic across multiple sources, comparing options or alternatives, analyzing trends or history, understanding markets or industries, or reviewing literature",
+   "palabras": 2048,
+   "kb": 12.8,
+   "modificado": "2026-10-07",
+   "dias": 3,
+   "es_agente": false,
+   "tiene_ejemplos": true,
+   "tiene_cuando": false,
+   "privado": false,
+   "ejemplo": false,
+   "es_local": false,
+   "herramientas": [
+    "Claude Code"
+   ],
+   "rutas": [
+    "~/.claude/skills/synced/b510fdee-d1fa-4db9-911d-d23dc5421ebc_07dd9d7f-fea1-476c-a3aa-1005fe7607aa/deep-research/SKILL.md"
+   ],
+   "copias_count": 1,
+   "es": {
+    "entradas": [
+     {
+      "que": "/references/researcher.md for instructions on how to conduct research.**",
+      "nivel": "declarado",
+      "por": "**As a first step, you must read {path_to_skill}/references/researcher.md for in"
+     },
+     {
+      "que": "/research_notes",
+      "nivel": "declarado",
+      "por": "prompt=\"Read the notes in {absolute path of your working directory}/research_not"
+     },
+     {
+      "que": "/references/report-writer.md for instructions on how to write your research report.**",
+      "nivel": "declarado",
+      "por": "**As a first step, you must read {path_to_skill}/references/report-writer.md for"
+     },
+     {
+      "que": "2024 Super Bowl",
+      "nivel": "inferido",
+      "por": "ruta nombrada sin verbo: | 1 | No meaningful decomposition — single factual ques"
+     }
+    ],
+    "salidas": [
+     {
+      "que": "researcher.md",
+      "nivel": "declarado",
+      "por": "You are acting as the **coordinator**. Your job is to analyze the user's questio"
+     },
+     {
+      "que": "report-writer.md",
+      "nivel": "declarado",
+      "por": "You are acting as the **coordinator**. Your job is to analyze the user's questio"
+     },
+     {
+      "que": "50 characters",
+      "nivel": "declarado",
+      "por": "First choose a title for this research. It names the folder that will hold this "
+     },
+     {
+      "que": "/tmp or an uploads folder",
+      "nivel": "declarado",
+      "por": "This research's folders go in the same directory you used for research earlier i"
+     },
+     {
+      "que": "/research_notes",
+      "nivel": "declarado",
+      "por": "Save your output notes to {absolute path of your working directory}/research_not"
+     },
+     {
+      "que": "2026 with prior issues clearly noted as such",
+      "nivel": "declarado",
+      "por": "> - Must reflect current state as of 2026 with prior issues clearly noted as suc"
+     },
+     {
+      "que": "/research_notes/Semiconductor supply chain outlook 2026/semiconductor_supply_chain.md",
+      "nivel": "declarado",
+      "por": "> Save your output notes to {absolute path of your working directory}/research_n"
+     },
+     {
+      "que": "/reports",
+      "nivel": "declarado",
+      "por": "Save your final report to this exact path: {absolute path of your working direct"
+     }
+    ],
+    "herramientas": [],
+    "opaca": false
+   }
+  },
+  {
    "nombre": "docs",
    "ruta": "~/.claude/skills/synced/5f2e7e33-a9c2-4625-b5cc-6da2fc30ac42_79cc362b-4985-48bb-a9a9-901e71a5dcf5/docs/SKILL.md",
    "herramienta": "Claude Code",
@@ -328,7 +507,7 @@
    "palabras": 210,
    "kb": 1.2,
    "modificado": "2026-09-29",
-   "dias": 3,
+   "dias": 11,
    "es_agente": false,
    "tiene_ejemplos": false,
    "tiene_cuando": false,
@@ -370,7 +549,7 @@
    "palabras": 1000,
    "kb": 6.8,
    "modificado": "2026-09-29",
-   "dias": 3,
+   "dias": 11,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": true,
@@ -391,16 +570,6 @@
       "que": "file.docx",
       "nivel": "declarado",
       "por": "| **Read** content | `pandoc -t markdown file.docx` |"
-     },
-     {
-      "que": "page-01.jpg",
-      "nivel": "inferido",
-      "por": "ruta nombrada sin verbo: `pdftoppm` zero-pads page numbers to the width of the p"
-     },
-     {
-      "que": "page-12.jpg",
-      "nivel": "inferido",
-      "por": "ruta nombrada sin verbo: `pdftoppm` zero-pads page numbers to the width of the p"
      },
      {
       "que": "doc.docx",
@@ -440,6 +609,16 @@
       "por": "ls page-*.jpg   # then Read the images"
      },
      {
+      "que": "page-01.jpg",
+      "nivel": "declarado",
+      "por": "`pdftoppm` zero-pads page numbers to the width of the page count (`page-01.jpg`…"
+     },
+     {
+      "que": "page-12.jpg",
+      "nivel": "declarado",
+      "por": "`pdftoppm` zero-pads page numbers to the width of the page count (`page-01.jpg`…"
+     },
+     {
       "que": "scripts/merge_runs.py doc.docx -o merged.docx",
       "nivel": "declarado",
       "por": "Word splits text across many `<w:r>` runs (revision ids, spell-check markers), s"
@@ -448,16 +627,6 @@
       "que": "scripts/accept_changes.py in.docx out.docx",
       "nivel": "declarado",
       "por": "To produce a clean copy with all tracked changes accepted: `python scripts/accep"
-     },
-     {
-      "que": "scripts/comment.py contract.docx",
-      "nivel": "declarado",
-      "por": "python scripts/comment.py contract.docx \"This cap is too low\" -o annotated.docx"
-     },
-     {
-      "que": "annotated.docx",
-      "nivel": "declarado",
-      "por": "python scripts/comment.py contract.docx \"This cap is too low\" -o annotated.docx"
      }
     ],
     "herramientas": [
@@ -474,7 +643,7 @@
    "palabras": 846,
    "kb": 5.3,
    "modificado": "2026-08-18",
-   "dias": 45,
+   "dias": 53,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": true,
@@ -520,9 +689,9 @@
    "ruta": "~/.claude/skills/synced/b510fdee-d1fa-4db9-911d-d23dc5421ebc_07dd9d7f-fea1-476c-a3aa-1005fe7607aa/google-workspace/SKILL.md",
    "herramienta": "Claude Code",
    "descripcion": "Read this before the first Google Drive, Docs, Sheets or Slides connector call whenever the task creates or changes a Google file. Use this skill whenever the user wants to create or change a Google Doc, Sheet or Slides ",
-   "palabras": 2439,
-   "kb": 13.5,
-   "modificado": "2026-09-28",
+   "palabras": 2571,
+   "kb": 14.5,
+   "modificado": "2026-10-06",
    "dias": 4,
    "es_agente": false,
    "tiene_ejemplos": true,
@@ -540,9 +709,9 @@
    "es": {
     "entradas": [
      {
-      "que": "references/sheets.md",
+      "que": "references/slides.md",
       "nivel": "declarado",
-      "por": "- **Read before you edit, and guard the write.** Every Docs and Slides read retu"
+      "por": "- **Read before you edit, and guard the write.** Send every Docs and Slides batc"
      },
      {
       "que": "100 KB",
@@ -596,7 +765,7 @@
    "palabras": 1270,
    "kb": 8.8,
    "modificado": "2026-09-23",
-   "dias": 9,
+   "dias": 17,
    "es_agente": true,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -613,16 +782,6 @@
    "copias_count": 2,
    "es": {
     "entradas": [
-     {
-      "que": "12 fillable fields",
-      "nivel": "inferido",
-      "por": "ruta nombrada sin verbo: \"claim\": \"The form has 12 fillable fields\","
-     },
-     {
-      "que": "2023 data",
-      "nivel": "inferido",
-      "por": "ruta nombrada sin verbo: \"uncertainties\": [\"Used 2023 data, may be stale\"],"
-     },
      {
       "que": "metrics.json",
       "nivel": "inferido",
@@ -666,6 +825,11 @@
       "por": "\"evidence\": \"Transcript Step 2 shows: 'Tool: Bash - python ocr_script.py image.p"
      },
      {
+      "que": "12 fillable fields",
+      "nivel": "declarado",
+      "por": "\"claim\": \"The form has 12 fillable fields\","
+     },
+     {
       "que": "12 fields in field_info.json",
       "nivel": "declarado",
       "por": "\"evidence\": \"Counted 12 fields in field_info.json\""
@@ -685,7 +849,7 @@
    "palabras": 1585,
    "kb": 10.3,
    "modificado": "2026-08-18",
-   "dias": 45,
+   "dias": 53,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -728,7 +892,7 @@
    "palabras": 2761,
    "kb": 19.1,
    "modificado": "2026-09-30",
-   "dias": 2,
+   "dias": 10,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": true,
@@ -801,7 +965,7 @@
    "palabras": 1592,
    "kb": 11.7,
    "modificado": "2026-09-30",
-   "dias": 2,
+   "dias": 10,
    "es_agente": false,
    "tiene_ejemplos": false,
    "tiene_cuando": false,
@@ -894,7 +1058,7 @@
    "palabras": 1674,
    "kb": 10.4,
    "modificado": "2026-09-23",
-   "dias": 9,
+   "dias": 17,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -912,19 +1076,9 @@
    "es": {
     "entradas": [
      {
-      "que": "/areas",
-      "nivel": "inferido",
-      "por": "ruta nombrada sin verbo: - `/areas/<slug>.md` — one file per distinct active pro"
-     },
-     {
-      "que": "slug>.md",
-      "nivel": "inferido",
-      "por": "ruta nombrada sin verbo: - `/areas/<slug>.md` — one file per distinct active pro"
-     },
-     {
-      "que": "/topics",
-      "nivel": "inferido",
-      "por": "ruta nombrada sin verbo: - `/topics/<slug>.md` — the user's facts organized by d"
+      "que": "lo que le digas en la conversación",
+      "nivel": "supuesto",
+      "por": "no declara nada: se le pasa por chat"
      }
     ],
     "salidas": [
@@ -939,12 +1093,17 @@
       "por": "- `/profile.md` — basic identity only. Each line is `- [stated] <key>: <value>` "
      },
      {
-      "que": "/people",
+      "que": "/areas",
       "nivel": "declarado",
-      "por": "- `/people/<slug>.md` — one file per person the export states a fact about. Rela"
+      "por": "- `/areas/<slug>.md` — one file per distinct active project or effort with a def"
      },
      {
       "que": "slug>.md",
+      "nivel": "declarado",
+      "por": "- `/areas/<slug>.md` — one file per distinct active project or effort with a def"
+     },
+     {
+      "que": "/people",
       "nivel": "declarado",
       "por": "- `/people/<slug>.md` — one file per person the export states a fact about. Rela"
      },
@@ -959,14 +1118,9 @@
       "por": "- `/people/<slug>.md` — one file per person the export states a fact about. Rela"
      },
      {
-      "que": "10 writes per turn",
+      "que": "/topics",
       "nivel": "declarado",
-      "por": "**5. Write in batches.** Memory allows around 10 writes per turn; a full export "
-     },
-     {
-      "que": "30 files",
-      "nivel": "declarado",
-      "por": "**5. Write in batches.** Memory allows around 10 writes per turn; a full export "
+      "por": "- `/topics/<slug>.md` — the user's facts organized by domain (hobbies, tastes, r"
      }
     ],
     "herramientas": [
@@ -983,7 +1137,7 @@
    "palabras": 3005,
    "kb": 17.7,
    "modificado": "2026-09-23",
-   "dias": 9,
+   "dias": 17,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -1073,9 +1227,9 @@
    "herramienta": "Claude Code",
    "descripcion": "Sos el asistente de onboarding de esta plantilla. Tu trabajo es dejar este vault recién clonado personalizado y operativo, entrevistando con calidez y SIN abrumar. Una pregunta por vez.",
    "palabras": 918,
-   "kb": 5.8,
-   "modificado": "2026-09-22",
-   "dias": 10,
+   "kb": 5.9,
+   "modificado": "2026-10-02",
+   "dias": 8,
    "es_agente": false,
    "tiene_ejemplos": false,
    "tiene_cuando": false,
@@ -1153,7 +1307,7 @@
    "palabras": 701,
    "kb": 5.3,
    "modificado": "2026-09-30",
-   "dias": 2,
+   "dias": 10,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -1246,7 +1400,7 @@
    "palabras": 361,
    "kb": 2.3,
    "modificado": "2026-09-23",
-   "dias": 9,
+   "dias": 17,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -1289,7 +1443,7 @@
    "palabras": 536,
    "kb": 3.6,
    "modificado": "2026-09-23",
-   "dias": 9,
+   "dias": 17,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -1337,7 +1491,7 @@
    "palabras": 1007,
    "kb": 7.9,
    "modificado": "2026-09-23",
-   "dias": 9,
+   "dias": 17,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -1445,6 +1599,59 @@
    }
   },
   {
+   "nombre": "phase-implementation-workflow",
+   "ruta": "~/.agents/skills/phase-implementation-workflow/SKILL.md",
+   "herramienta": "Gemini / Antigravity",
+   "descripcion": ">",
+   "palabras": 1710,
+   "kb": 10.5,
+   "modificado": "2026-10-04",
+   "dias": 6,
+   "es_agente": false,
+   "tiene_ejemplos": false,
+   "tiene_cuando": true,
+   "privado": false,
+   "ejemplo": false,
+   "es_local": false,
+   "herramientas": [
+    "Gemini / Antigravity"
+   ],
+   "rutas": [
+    "~/.agents/skills/phase-implementation-workflow/SKILL.md"
+   ],
+   "copias_count": 1,
+   "es": {
+    "entradas": [
+     {
+      "que": "/faseN.md",
+      "nivel": "declarado",
+      "por": "Este flujo es el mismo sin importar desde qué carpeta del repo se invoque ni cuá"
+     },
+     {
+      "que": "task>.md",
+      "nivel": "inferido",
+      "por": "ruta nombrada sin verbo: análisis + fases, tareas con la estructura odd/<feature"
+     }
+    ],
+    "salidas": [
+     {
+      "que": "/faseN.md",
+      "nivel": "declarado",
+      "por": "Para cada fase, crear `odd/<nombre-del-feature>/faseN.md`."
+     },
+     {
+      "que": "faseN.md",
+      "nivel": "declarado",
+      "por": "- Cada `faseN.md` sigue esta plantilla exacta:"
+     }
+    ],
+    "herramientas": [
+     "git"
+    ],
+    "opaca": false
+   }
+  },
+  {
    "nombre": "playwright-cli",
    "ruta": "~/.claude/skills/playwright-cli/SKILL.md",
    "herramienta": "Claude Code",
@@ -1452,7 +1659,7 @@
    "palabras": 1800,
    "kb": 15.3,
    "modificado": "2026-09-24",
-   "dias": 8,
+   "dias": 16,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -1513,11 +1720,6 @@
     ],
     "salidas": [
      {
-      "que": "/i for case-insensitive",
-      "nivel": "declarado",
-      "por": "# wrap the regexp in slashes to add flags, e.g. /i for case-insensitive"
-     },
-     {
       "que": "page.png",
       "nivel": "declarado",
       "por": "playwright-cli screenshot --filename=page.png"
@@ -1538,19 +1740,24 @@
       "por": "playwright-cli --raw eval \"JSON.stringify([...document.querySelectorAll('a')].ma"
      },
      {
-      "que": "10 for Chromium",
+      "que": "before.yml",
       "nivel": "declarado",
-      "por": "# Emulate a generic mobile device (Pixel 10 for Chromium, iPhone 17 for WebKit)."
+      "por": "playwright-cli --raw snapshot > before.yml"
      },
      {
-      "que": "17 for WebKit",
+      "que": "after.yml",
       "nivel": "declarado",
-      "por": "# Emulate a generic mobile device (Pixel 10 for Chromium, iPhone 17 for WebKit)."
+      "por": "playwright-cli --raw snapshot > after.yml"
      },
      {
       "que": "after-click.yaml",
       "nivel": "declarado",
       "por": "playwright-cli snapshot --filename=after-click.yaml"
+     },
+     {
+      "que": "settings-after.png",
+      "nivel": "declarado",
+      "por": "playwright-cli screenshot --filename=settings-after.png"
      }
     ],
     "herramientas": [
@@ -1566,8 +1773,8 @@
    "descripcion": "Use this skill any time a .pptx or .potx file is involved in any way — as input, output, or both. This includes: creating slide decks, pitch decks, or presentations as PowerPoint (.pptx) files; reading, parsing, or extra",
    "palabras": 3306,
    "kb": 21.3,
-   "modificado": "2026-10-01",
-   "dias": 1,
+   "modificado": "2026-10-02",
+   "dias": 8,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": true,
@@ -1671,7 +1878,7 @@
    "palabras": 418,
    "kb": 2.7,
    "modificado": "2026-09-30",
-   "dias": 2,
+   "dias": 10,
    "es_agente": false,
    "tiene_ejemplos": false,
    "tiene_cuando": false,
@@ -1713,8 +1920,8 @@
    "descripcion": "Actúa como **revisor de Pull Requests** del vault de {{OWNER}}, en modo equipo. Tu trabajo es que {{OWNER}} pueda revisar el trabajo de otra persona **sin leer un diff crudo**: se lo explicás en el lenguaje del vault (no",
    "palabras": 828,
    "kb": 5.0,
-   "modificado": "2026-08-27",
-   "dias": 36,
+   "modificado": "2026-10-02",
+   "dias": 8,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -1791,8 +1998,8 @@
    "descripcion": "Actúa como auditor de seguridad A DEMANDA del vault de {{OWNER}}. Ayudás a {{OWNER}} a decidir si es seguro **instalar/abrir** algo (un plugin de Obsidian, una skill o hook de Claude Code, un paquete npm/pip, un repo ext",
    "palabras": 653,
    "kb": 4.4,
-   "modificado": "2026-08-27",
-   "dias": 36,
+   "modificado": "2026-10-02",
+   "dias": 8,
    "es_agente": false,
    "tiene_ejemplos": false,
    "tiene_cuando": false,
@@ -1838,9 +2045,9 @@
    "herramienta": "Gemini / Antigravity",
    "descripcion": "Audita la superficie de seguridad del vault (secretos committeados, integridad del .gitignore, hooks y permisos).",
    "palabras": 167,
-   "kb": 1.2,
+   "kb": 1.3,
    "modificado": "2026-10-02",
-   "dias": 0,
+   "dias": 8,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": true,
@@ -1883,7 +2090,7 @@
    "palabras": 5234,
    "kb": 32.6,
    "modificado": "2026-09-30",
-   "dias": 2,
+   "dias": 10,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": true,
@@ -2000,7 +2207,7 @@
    "palabras": 443,
    "kb": 3.3,
    "modificado": "2026-09-30",
-   "dias": 2,
+   "dias": 10,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -2049,11 +2256,11 @@
    "nombre": "verifier",
    "ruta": ".claude/agents/verifier.md",
    "herramienta": "Claude Code",
-   "descripcion": "Revisa el diff staged antes de un commit y juzga calidad de conocimiento sin modificar archivos.",
+   "descripcion": ">",
    "palabras": 903,
    "kb": 5.9,
    "modificado": "2026-10-02",
-   "dias": 0,
+   "dias": 8,
    "es_agente": true,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -2123,7 +2330,7 @@
    "palabras": 1312,
    "kb": 8.4,
    "modificado": "2026-09-23",
-   "dias": 9,
+   "dias": 17,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": true,
@@ -2191,7 +2398,7 @@
    "palabras": 240,
    "kb": 1.6,
    "modificado": "2026-10-02",
-   "dias": 0,
+   "dias": 8,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": true,
@@ -2232,7 +2439,7 @@
    "palabras": 1490,
    "kb": 10.1,
    "modificado": "2026-09-23",
-   "dias": 9,
+   "dias": 17,
    "es_agente": true,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -2244,7 +2451,7 @@
      {
       "que": "benchmark.json",
       "nivel": "declarado",
-      "por": "1. Read the benchmark.json containing all run results"
+      "por": "- **benchmark_data_path**: Path to the in-progress benchmark.json with all run r"
      },
      {
       "que": "10 and note specific issues",
@@ -2254,9 +2461,9 @@
     ],
     "salidas": [
      {
-      "que": "benchmark.json",
-      "nivel": "declarado",
-      "por": "- **benchmark_data_path**: Path to the in-progress benchmark.json with all run r"
+      "que": "un texto nuevo (sitio sin declarar)",
+      "nivel": "supuesto",
+      "por": "por el tipo de skill"
      }
     ],
     "herramientas": [],
@@ -2271,7 +2478,7 @@
    "palabras": 1490,
    "kb": 10.1,
    "modificado": "2026-09-22",
-   "dias": 10,
+   "dias": 18,
    "es_agente": true,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -2283,7 +2490,7 @@
      {
       "que": "benchmark.json",
       "nivel": "declarado",
-      "por": "1. Read the benchmark.json containing all run results"
+      "por": "- **benchmark_data_path**: Path to the in-progress benchmark.json with all run r"
      },
      {
       "que": "10 and note specific issues",
@@ -2293,9 +2500,43 @@
     ],
     "salidas": [
      {
-      "que": "benchmark.json",
+      "que": "un texto nuevo (sitio sin declarar)",
+      "nivel": "supuesto",
+      "por": "por el tipo de skill"
+     }
+    ],
+    "herramientas": [],
+    "opaca": false
+   }
+  },
+  {
+   "nombre": "built-in-browser",
+   "ruta": "~/.claude/skills/synced/b510fdee-d1fa-4db9-911d-d23dc5421ebc_07dd9d7f-fea1-476c-a3aa-1005fe7607aa/built-in-browser/SKILL.md",
+   "herramienta": "Claude Code",
+   "descripcion": "Read this skill before the first step that uses the built-in browser, the browser pane inside the Claude desktop app (also called the in-app browser, the browser pane, Claude's browser, or \\\"your own browser\\\"), whose to",
+   "palabras": 1043,
+   "kb": 6.4,
+   "modificado": "2026-10-07",
+   "dias": 3,
+   "es_agente": false,
+   "tiene_ejemplos": true,
+   "tiene_cuando": false,
+   "privado": false,
+   "ejemplo": false,
+   "es_local": false,
+   "es": {
+    "entradas": [
+     {
+      "que": "lo que le digas en la conversación",
+      "nivel": "supuesto",
+      "por": "no declara nada: se le pasa por chat"
+     }
+    ],
+    "salidas": [
+     {
+      "que": "LICENSE.txt",
       "nivel": "declarado",
-      "por": "- **benchmark_data_path**: Path to the in-progress benchmark.json with all run r"
+      "por": "license: Proprietary. LICENSE.txt has complete terms"
      }
     ],
     "herramientas": [],
@@ -2307,9 +2548,9 @@
    "ruta": ".agents/skills/check-links/SKILL.md",
    "herramienta": "Gemini / Antigravity",
    "descripcion": "Detecta y propone corrección de enlaces rotos, wikilinks desalineados o notas huérfanas en el vault.",
-   "palabras": 177,
-   "kb": 1.3,
-   "modificado": "2026-10-02",
+   "palabras": 197,
+   "kb": 1.4,
+   "modificado": "2026-10-10",
    "dias": 0,
    "es_agente": false,
    "tiene_ejemplos": true,
@@ -2357,14 +2598,53 @@
     ],
     "salidas": [
      {
-      "que": "solo una respuesta en el chat: no deja nada escrito",
-      "nivel": "supuesto",
-      "por": "no declara ninguna salida"
+      "que": "00 Sistema",
+      "nivel": "declarado",
+      "por": "- Con `heal-links.py`, corrige los enlaces dentro de las notas de `00 Sistema/` "
+     },
+     {
+      "que": "06 Raw",
+      "nivel": "declarado",
+      "por": "- Con `heal-links.py`, corrige los enlaces dentro de las notas de `00 Sistema/` "
      }
     ],
     "herramientas": [
      "Python"
     ],
+    "opaca": false
+   }
+  },
+  {
+   "nombre": "chrome-browser",
+   "ruta": "~/.claude/skills/synced/b510fdee-d1fa-4db9-911d-d23dc5421ebc_07dd9d7f-fea1-476c-a3aa-1005fe7607aa/chrome-browser/SKILL.md",
+   "herramienta": "Claude Code",
+   "descripcion": "Read this skill before the first step that uses Claude in Chrome, the browser extension whose tools are named mcp__claude-in-chrome__* (also called Chrome, the browser extension, or the external browser) and which acts i",
+   "palabras": 886,
+   "kb": 5.7,
+   "modificado": "2026-10-07",
+   "dias": 3,
+   "es_agente": false,
+   "tiene_ejemplos": true,
+   "tiene_cuando": true,
+   "privado": false,
+   "ejemplo": false,
+   "es_local": false,
+   "es": {
+    "entradas": [
+     {
+      "que": "console.log",
+      "nivel": "declarado",
+      "por": "3. Claude can use `mcp__claude-in-chrome__javascript_tool` to check for and dism"
+     }
+    ],
+    "salidas": [
+     {
+      "que": "LICENSE.txt",
+      "nivel": "declarado",
+      "por": "license: Proprietary. LICENSE.txt has complete terms"
+     }
+    ],
+    "herramientas": [],
     "opaca": false
    }
   },
@@ -2376,7 +2656,7 @@
    "palabras": 991,
    "kb": 7.1,
    "modificado": "2026-09-23",
-   "dias": 9,
+   "dias": 17,
    "es_agente": true,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -2412,7 +2692,7 @@
    "palabras": 991,
    "kb": 7.1,
    "modificado": "2026-09-22",
-   "dias": 10,
+   "dias": 18,
    "es_agente": true,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -2448,7 +2728,7 @@
    "palabras": 338,
    "kb": 2.2,
    "modificado": "2026-09-23",
-   "dias": 9,
+   "dias": 17,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -2476,13 +2756,47 @@
   },
   {
    "nombre": "computer-use",
+   "ruta": "~/.claude/skills/synced/b510fdee-d1fa-4db9-911d-d23dc5421ebc_07dd9d7f-fea1-476c-a3aa-1005fe7607aa/computer-use/SKILL.md",
+   "herramienta": "Claude Code",
+   "descripcion": "Read this skill before the first step of any request to do something in an app on the person's own computer (Notes, Finder, System Settings, any desktop app), to look at their screen, or for \\\"computer use\\\". Computer us",
+   "palabras": 1452,
+   "kb": 9.1,
+   "modificado": "2026-10-08",
+   "dias": 2,
+   "es_agente": false,
+   "tiene_ejemplos": true,
+   "tiene_cuando": false,
+   "privado": false,
+   "ejemplo": false,
+   "es_local": false,
+   "es": {
+    "entradas": [
+     {
+      "que": "lo que le digas en la conversación",
+      "nivel": "supuesto",
+      "por": "no declara nada: se le pasa por chat"
+     }
+    ],
+    "salidas": [
+     {
+      "que": "LICENSE.txt",
+      "nivel": "declarado",
+      "por": "license: Proprietary. LICENSE.txt has complete terms"
+     }
+    ],
+    "herramientas": [],
+    "opaca": false
+   }
+  },
+  {
+   "nombre": "computer-use",
    "ruta": "~/.agents/skills/computer-use/SKILL.md",
    "herramienta": "Gemini / Antigravity",
    "descripcion": ">-",
    "palabras": 338,
    "kb": 2.2,
    "modificado": "2026-09-23",
-   "dias": 9,
+   "dias": 17,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -2516,7 +2830,7 @@
    "palabras": 206,
    "kb": 1.6,
    "modificado": "2026-10-02",
-   "dias": 0,
+   "dias": 8,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": true,
@@ -2526,18 +2840,6 @@
    "es": {
     "entradas": [
      {
-      "que": "/../../00 Sistema/001_plantillas/Plantilla Tarjeta Kanban.md",
-      "nivel": "inferido",
-      "por": "ruta nombrada sin verbo: - **Plantilla base:** [Plantilla Tarjeta Kanban](<../.."
-     }
-    ],
-    "salidas": [
-     {
-      "que": "03 Proyectos/Kanban/Pendientes",
-      "nivel": "declarado",
-      "por": "description: Crea una tarjeta de tarea en el tablero Headless Kanban (03 Proyect"
-     },
-     {
       "que": "06 Raw",
       "nivel": "declarado",
       "por": "- **Ruta de origen:** Archivo de insumo en `06 Raw/` o `04 Knowledge/`."
@@ -2546,6 +2848,18 @@
       "que": "04 Knowledge",
       "nivel": "declarado",
       "por": "- **Ruta de origen:** Archivo de insumo en `06 Raw/` o `04 Knowledge/`."
+     },
+     {
+      "que": "/../../00 Sistema/001_plantillas/Plantilla Tarjeta Kanban.md",
+      "nivel": "declarado",
+      "por": "- **Plantilla base:** [Plantilla Tarjeta Kanban](<../../../00 Sistema/001_planti"
+     }
+    ],
+    "salidas": [
+     {
+      "que": "03 Proyectos/Kanban/Pendientes",
+      "nivel": "declarado",
+      "por": "description: Crea una tarjeta de tarea en el tablero Headless Kanban (03 Proyect"
      },
      {
       "que": "03 Proyectos/Kanban/Pendientes/AAAA-MM-DD",
@@ -2565,6 +2879,90 @@
    }
   },
   {
+   "nombre": "deep-research",
+   "ruta": "~/.claude/skills/synced/b510fdee-d1fa-4db9-911d-d23dc5421ebc_07dd9d7f-fea1-476c-a3aa-1005fe7607aa/deep-research/SKILL.md",
+   "herramienta": "Claude Code",
+   "descripcion": "Use this skill when the user's prompt requires (1) researching a topic across multiple sources, comparing options or alternatives, analyzing trends or history, understanding markets or industries, or reviewing literature",
+   "palabras": 2048,
+   "kb": 12.8,
+   "modificado": "2026-10-07",
+   "dias": 3,
+   "es_agente": false,
+   "tiene_ejemplos": true,
+   "tiene_cuando": false,
+   "privado": false,
+   "ejemplo": false,
+   "es_local": false,
+   "es": {
+    "entradas": [
+     {
+      "que": "/references/researcher.md for instructions on how to conduct research.**",
+      "nivel": "declarado",
+      "por": "**As a first step, you must read {path_to_skill}/references/researcher.md for in"
+     },
+     {
+      "que": "/research_notes",
+      "nivel": "declarado",
+      "por": "prompt=\"Read the notes in {absolute path of your working directory}/research_not"
+     },
+     {
+      "que": "/references/report-writer.md for instructions on how to write your research report.**",
+      "nivel": "declarado",
+      "por": "**As a first step, you must read {path_to_skill}/references/report-writer.md for"
+     },
+     {
+      "que": "2024 Super Bowl",
+      "nivel": "inferido",
+      "por": "ruta nombrada sin verbo: | 1 | No meaningful decomposition — single factual ques"
+     }
+    ],
+    "salidas": [
+     {
+      "que": "researcher.md",
+      "nivel": "declarado",
+      "por": "You are acting as the **coordinator**. Your job is to analyze the user's questio"
+     },
+     {
+      "que": "report-writer.md",
+      "nivel": "declarado",
+      "por": "You are acting as the **coordinator**. Your job is to analyze the user's questio"
+     },
+     {
+      "que": "50 characters",
+      "nivel": "declarado",
+      "por": "First choose a title for this research. It names the folder that will hold this "
+     },
+     {
+      "que": "/tmp or an uploads folder",
+      "nivel": "declarado",
+      "por": "This research's folders go in the same directory you used for research earlier i"
+     },
+     {
+      "que": "/research_notes",
+      "nivel": "declarado",
+      "por": "Save your output notes to {absolute path of your working directory}/research_not"
+     },
+     {
+      "que": "2026 with prior issues clearly noted as such",
+      "nivel": "declarado",
+      "por": "> - Must reflect current state as of 2026 with prior issues clearly noted as suc"
+     },
+     {
+      "que": "/research_notes/Semiconductor supply chain outlook 2026/semiconductor_supply_chain.md",
+      "nivel": "declarado",
+      "por": "> Save your output notes to {absolute path of your working directory}/research_n"
+     },
+     {
+      "que": "/reports",
+      "nivel": "declarado",
+      "por": "Save your final report to this exact path: {absolute path of your working direct"
+     }
+    ],
+    "herramientas": [],
+    "opaca": false
+   }
+  },
+  {
    "nombre": "docs",
    "ruta": "~/.claude/skills/synced/5f2e7e33-a9c2-4625-b5cc-6da2fc30ac42_79cc362b-4985-48bb-a9a9-901e71a5dcf5/docs/SKILL.md",
    "herramienta": "Claude Code",
@@ -2572,7 +2970,7 @@
    "palabras": 210,
    "kb": 1.2,
    "modificado": "2026-09-23",
-   "dias": 9,
+   "dias": 17,
    "es_agente": false,
    "tiene_ejemplos": false,
    "tiene_cuando": false,
@@ -2606,7 +3004,7 @@
    "palabras": 215,
    "kb": 1.2,
    "modificado": "2026-09-29",
-   "dias": 3,
+   "dias": 11,
    "es_agente": false,
    "tiene_ejemplos": false,
    "tiene_cuando": false,
@@ -2640,7 +3038,7 @@
    "palabras": 1000,
    "kb": 6.8,
    "modificado": "2026-09-23",
-   "dias": 9,
+   "dias": 17,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": true,
@@ -2653,16 +3051,6 @@
       "que": "file.docx",
       "nivel": "declarado",
       "por": "| **Read** content | `pandoc -t markdown file.docx` |"
-     },
-     {
-      "que": "page-01.jpg",
-      "nivel": "inferido",
-      "por": "ruta nombrada sin verbo: `pdftoppm` zero-pads page numbers to the width of the p"
-     },
-     {
-      "que": "page-12.jpg",
-      "nivel": "inferido",
-      "por": "ruta nombrada sin verbo: `pdftoppm` zero-pads page numbers to the width of the p"
      },
      {
       "que": "doc.docx",
@@ -2702,6 +3090,16 @@
       "por": "ls page-*.jpg   # then Read the images"
      },
      {
+      "que": "page-01.jpg",
+      "nivel": "declarado",
+      "por": "`pdftoppm` zero-pads page numbers to the width of the page count (`page-01.jpg`…"
+     },
+     {
+      "que": "page-12.jpg",
+      "nivel": "declarado",
+      "por": "`pdftoppm` zero-pads page numbers to the width of the page count (`page-01.jpg`…"
+     },
+     {
       "que": "scripts/merge_runs.py doc.docx -o merged.docx",
       "nivel": "declarado",
       "por": "Word splits text across many `<w:r>` runs (revision ids, spell-check markers), s"
@@ -2710,16 +3108,6 @@
       "que": "scripts/accept_changes.py in.docx out.docx",
       "nivel": "declarado",
       "por": "To produce a clean copy with all tracked changes accepted: `python scripts/accep"
-     },
-     {
-      "que": "scripts/comment.py contract.docx",
-      "nivel": "declarado",
-      "por": "python scripts/comment.py contract.docx \"This cap is too low\" -o annotated.docx"
-     },
-     {
-      "que": "annotated.docx",
-      "nivel": "declarado",
-      "por": "python scripts/comment.py contract.docx \"This cap is too low\" -o annotated.docx"
      }
     ],
     "herramientas": [
@@ -2736,7 +3124,7 @@
    "palabras": 1108,
    "kb": 7.5,
    "modificado": "2026-09-29",
-   "dias": 3,
+   "dias": 11,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": true,
@@ -2749,16 +3137,6 @@
       "que": "file.docx",
       "nivel": "declarado",
       "por": "| **Read** content | `pandoc -t markdown file.docx` |"
-     },
-     {
-      "que": "page-01.jpg",
-      "nivel": "inferido",
-      "por": "ruta nombrada sin verbo: `pdftoppm` zero-pads page numbers to the width of the p"
-     },
-     {
-      "que": "page-12.jpg",
-      "nivel": "inferido",
-      "por": "ruta nombrada sin verbo: `pdftoppm` zero-pads page numbers to the width of the p"
      },
      {
       "que": "doc.docx",
@@ -2798,6 +3176,16 @@
       "por": "ls page-*.jpg   # then Read the images"
      },
      {
+      "que": "page-01.jpg",
+      "nivel": "declarado",
+      "por": "`pdftoppm` zero-pads page numbers to the width of the page count (`page-01.jpg`…"
+     },
+     {
+      "que": "page-12.jpg",
+      "nivel": "declarado",
+      "por": "`pdftoppm` zero-pads page numbers to the width of the page count (`page-01.jpg`…"
+     },
+     {
       "que": "scripts/merge_runs.py doc.docx -o merged.docx",
       "nivel": "declarado",
       "por": "Word splits text across many `<w:r>` runs (revision ids, spell-check markers), s"
@@ -2806,16 +3194,6 @@
       "que": "scripts/accept_changes.py in.docx out.docx",
       "nivel": "declarado",
       "por": "To produce a clean copy with all tracked changes accepted: `python scripts/accep"
-     },
-     {
-      "que": "scripts/comment.py contract.docx",
-      "nivel": "declarado",
-      "por": "python scripts/comment.py contract.docx \"This cap is too low\" -o annotated.docx"
-     },
-     {
-      "que": "annotated.docx",
-      "nivel": "declarado",
-      "por": "python scripts/comment.py contract.docx \"This cap is too low\" -o annotated.docx"
      }
     ],
     "herramientas": [
@@ -2832,7 +3210,7 @@
    "palabras": 846,
    "kb": 5.3,
    "modificado": "2026-08-18",
-   "dias": 45,
+   "dias": 53,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": true,
@@ -2871,9 +3249,9 @@
    "ruta": "~/.claude/skills/synced/b510fdee-d1fa-4db9-911d-d23dc5421ebc_07dd9d7f-fea1-476c-a3aa-1005fe7607aa/google-workspace/SKILL.md",
    "herramienta": "Claude Code",
    "descripcion": "Read this before the first Google Drive, Docs, Sheets or Slides connector call whenever the task creates or changes a Google file. Use this skill whenever the user wants to create or change a Google Doc, Sheet or Slides ",
-   "palabras": 2439,
-   "kb": 13.5,
-   "modificado": "2026-09-28",
+   "palabras": 2571,
+   "kb": 14.5,
+   "modificado": "2026-10-06",
    "dias": 4,
    "es_agente": false,
    "tiene_ejemplos": true,
@@ -2884,9 +3262,9 @@
    "es": {
     "entradas": [
      {
-      "que": "references/sheets.md",
+      "que": "references/slides.md",
       "nivel": "declarado",
-      "por": "- **Read before you edit, and guard the write.** Every Docs and Slides read retu"
+      "por": "- **Read before you edit, and guard the write.** Send every Docs and Slides batc"
      },
      {
       "que": "100 KB",
@@ -2940,7 +3318,7 @@
    "palabras": 1270,
    "kb": 8.8,
    "modificado": "2026-09-23",
-   "dias": 9,
+   "dias": 17,
    "es_agente": true,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -2949,16 +3327,6 @@
    "es_local": false,
    "es": {
     "entradas": [
-     {
-      "que": "12 fillable fields",
-      "nivel": "inferido",
-      "por": "ruta nombrada sin verbo: \"claim\": \"The form has 12 fillable fields\","
-     },
-     {
-      "que": "2023 data",
-      "nivel": "inferido",
-      "por": "ruta nombrada sin verbo: \"uncertainties\": [\"Used 2023 data, may be stale\"],"
-     },
      {
       "que": "metrics.json",
       "nivel": "inferido",
@@ -3000,6 +3368,11 @@
       "que": "image.png",
       "nivel": "declarado",
       "por": "\"evidence\": \"Transcript Step 2 shows: 'Tool: Bash - python ocr_script.py image.p"
+     },
+     {
+      "que": "12 fillable fields",
+      "nivel": "declarado",
+      "por": "\"claim\": \"The form has 12 fillable fields\","
      },
      {
       "que": "12 fields in field_info.json",
@@ -3021,7 +3394,7 @@
    "palabras": 1270,
    "kb": 8.8,
    "modificado": "2026-09-22",
-   "dias": 10,
+   "dias": 18,
    "es_agente": true,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -3030,16 +3403,6 @@
    "es_local": false,
    "es": {
     "entradas": [
-     {
-      "que": "12 fillable fields",
-      "nivel": "inferido",
-      "por": "ruta nombrada sin verbo: \"claim\": \"The form has 12 fillable fields\","
-     },
-     {
-      "que": "2023 data",
-      "nivel": "inferido",
-      "por": "ruta nombrada sin verbo: \"uncertainties\": [\"Used 2023 data, may be stale\"],"
-     },
      {
       "que": "metrics.json",
       "nivel": "inferido",
@@ -3083,6 +3446,11 @@
       "por": "\"evidence\": \"Transcript Step 2 shows: 'Tool: Bash - python ocr_script.py image.p"
      },
      {
+      "que": "12 fillable fields",
+      "nivel": "declarado",
+      "por": "\"claim\": \"The form has 12 fillable fields\","
+     },
+     {
       "que": "12 fields in field_info.json",
       "nivel": "declarado",
       "por": "\"evidence\": \"Counted 12 fields in field_info.json\""
@@ -3102,7 +3470,7 @@
    "palabras": 1585,
    "kb": 10.3,
    "modificado": "2026-08-18",
-   "dias": 45,
+   "dias": 53,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -3136,7 +3504,7 @@
    "palabras": 1585,
    "kb": 10.3,
    "modificado": "2026-08-18",
-   "dias": 45,
+   "dias": 53,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -3170,7 +3538,7 @@
    "palabras": 2761,
    "kb": 19.1,
    "modificado": "2026-09-30",
-   "dias": 2,
+   "dias": 10,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": true,
@@ -3236,7 +3604,7 @@
    "palabras": 1592,
    "kb": 11.7,
    "modificado": "2026-09-30",
-   "dias": 2,
+   "dias": 10,
    "es_agente": false,
    "tiene_ejemplos": false,
    "tiene_cuando": false,
@@ -3320,7 +3688,7 @@
    "palabras": 1592,
    "kb": 11.7,
    "modificado": "2026-09-30",
-   "dias": 2,
+   "dias": 10,
    "es_agente": false,
    "tiene_ejemplos": false,
    "tiene_cuando": false,
@@ -3404,7 +3772,7 @@
    "palabras": 1674,
    "kb": 10.4,
    "modificado": "2026-09-23",
-   "dias": 9,
+   "dias": 17,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -3414,19 +3782,9 @@
    "es": {
     "entradas": [
      {
-      "que": "/areas",
-      "nivel": "inferido",
-      "por": "ruta nombrada sin verbo: - `/areas/<slug>.md` — one file per distinct active pro"
-     },
-     {
-      "que": "slug>.md",
-      "nivel": "inferido",
-      "por": "ruta nombrada sin verbo: - `/areas/<slug>.md` — one file per distinct active pro"
-     },
-     {
-      "que": "/topics",
-      "nivel": "inferido",
-      "por": "ruta nombrada sin verbo: - `/topics/<slug>.md` — the user's facts organized by d"
+      "que": "lo que le digas en la conversación",
+      "nivel": "supuesto",
+      "por": "no declara nada: se le pasa por chat"
      }
     ],
     "salidas": [
@@ -3441,12 +3799,17 @@
       "por": "- `/profile.md` — basic identity only. Each line is `- [stated] <key>: <value>` "
      },
      {
-      "que": "/people",
+      "que": "/areas",
       "nivel": "declarado",
-      "por": "- `/people/<slug>.md` — one file per person the export states a fact about. Rela"
+      "por": "- `/areas/<slug>.md` — one file per distinct active project or effort with a def"
      },
      {
       "que": "slug>.md",
+      "nivel": "declarado",
+      "por": "- `/areas/<slug>.md` — one file per distinct active project or effort with a def"
+     },
+     {
+      "que": "/people",
       "nivel": "declarado",
       "por": "- `/people/<slug>.md` — one file per person the export states a fact about. Rela"
      },
@@ -3461,14 +3824,9 @@
       "por": "- `/people/<slug>.md` — one file per person the export states a fact about. Rela"
      },
      {
-      "que": "10 writes per turn",
+      "que": "/topics",
       "nivel": "declarado",
-      "por": "**5. Write in batches.** Memory allows around 10 writes per turn; a full export "
-     },
-     {
-      "que": "30 files",
-      "nivel": "declarado",
-      "por": "**5. Write in batches.** Memory allows around 10 writes per turn; a full export "
+      "por": "- `/topics/<slug>.md` — the user's facts organized by domain (hobbies, tastes, r"
      }
     ],
     "herramientas": [
@@ -3485,7 +3843,7 @@
    "palabras": 1674,
    "kb": 10.4,
    "modificado": "2026-09-22",
-   "dias": 10,
+   "dias": 18,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -3495,19 +3853,9 @@
    "es": {
     "entradas": [
      {
-      "que": "/areas",
-      "nivel": "inferido",
-      "por": "ruta nombrada sin verbo: - `/areas/<slug>.md` — one file per distinct active pro"
-     },
-     {
-      "que": "slug>.md",
-      "nivel": "inferido",
-      "por": "ruta nombrada sin verbo: - `/areas/<slug>.md` — one file per distinct active pro"
-     },
-     {
-      "que": "/topics",
-      "nivel": "inferido",
-      "por": "ruta nombrada sin verbo: - `/topics/<slug>.md` — the user's facts organized by d"
+      "que": "lo que le digas en la conversación",
+      "nivel": "supuesto",
+      "por": "no declara nada: se le pasa por chat"
      }
     ],
     "salidas": [
@@ -3522,12 +3870,17 @@
       "por": "- `/profile.md` — basic identity only. Each line is `- [stated] <key>: <value>` "
      },
      {
-      "que": "/people",
+      "que": "/areas",
       "nivel": "declarado",
-      "por": "- `/people/<slug>.md` — one file per person the export states a fact about. Rela"
+      "por": "- `/areas/<slug>.md` — one file per distinct active project or effort with a def"
      },
      {
       "que": "slug>.md",
+      "nivel": "declarado",
+      "por": "- `/areas/<slug>.md` — one file per distinct active project or effort with a def"
+     },
+     {
+      "que": "/people",
       "nivel": "declarado",
       "por": "- `/people/<slug>.md` — one file per person the export states a fact about. Rela"
      },
@@ -3542,14 +3895,9 @@
       "por": "- `/people/<slug>.md` — one file per person the export states a fact about. Rela"
      },
      {
-      "que": "10 writes per turn",
+      "que": "/topics",
       "nivel": "declarado",
-      "por": "**5. Write in batches.** Memory allows around 10 writes per turn; a full export "
-     },
-     {
-      "que": "30 files",
-      "nivel": "declarado",
-      "por": "**5. Write in batches.** Memory allows around 10 writes per turn; a full export "
+      "por": "- `/topics/<slug>.md` — the user's facts organized by domain (hobbies, tastes, r"
      }
     ],
     "herramientas": [
@@ -3566,7 +3914,7 @@
    "palabras": 3005,
    "kb": 17.7,
    "modificado": "2026-09-23",
-   "dias": 9,
+   "dias": 17,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -3650,7 +3998,7 @@
    "palabras": 3005,
    "kb": 17.7,
    "modificado": "2026-09-22",
-   "dias": 10,
+   "dias": 18,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -3732,9 +4080,9 @@
    "herramienta": "Claude Code",
    "descripcion": "Sos el asistente de onboarding de esta plantilla. Tu trabajo es dejar este vault recién clonado personalizado y operativo, entrevistando con calidez y SIN abrumar. Una pregunta por vez.",
    "palabras": 918,
-   "kb": 5.8,
-   "modificado": "2026-09-22",
-   "dias": 10,
+   "kb": 5.9,
+   "modificado": "2026-10-02",
+   "dias": 8,
    "es_agente": false,
    "tiene_ejemplos": false,
    "tiene_cuando": false,
@@ -3805,7 +4153,7 @@
    "palabras": 701,
    "kb": 5.3,
    "modificado": "2026-09-30",
-   "dias": 2,
+   "dias": 10,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -3891,7 +4239,7 @@
    "palabras": 361,
    "kb": 2.3,
    "modificado": "2026-09-23",
-   "dias": 9,
+   "dias": 17,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -3925,7 +4273,7 @@
    "palabras": 361,
    "kb": 2.3,
    "modificado": "2026-09-23",
-   "dias": 9,
+   "dias": 17,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -3959,7 +4307,7 @@
    "palabras": 536,
    "kb": 3.6,
    "modificado": "2026-09-23",
-   "dias": 9,
+   "dias": 17,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -3998,7 +4346,7 @@
    "palabras": 536,
    "kb": 3.6,
    "modificado": "2026-09-23",
-   "dias": 9,
+   "dias": 17,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -4037,7 +4385,7 @@
    "palabras": 1007,
    "kb": 7.9,
    "modificado": "2026-09-23",
-   "dias": 9,
+   "dias": 17,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -4144,7 +4492,7 @@
    "palabras": 1007,
    "kb": 7.9,
    "modificado": "2026-09-22",
-   "dias": 10,
+   "dias": 18,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -4244,6 +4592,52 @@
    }
   },
   {
+   "nombre": "phase-implementation-workflow",
+   "ruta": "~/.agents/skills/phase-implementation-workflow/SKILL.md",
+   "herramienta": "Gemini / Antigravity",
+   "descripcion": ">",
+   "palabras": 1710,
+   "kb": 10.5,
+   "modificado": "2026-10-04",
+   "dias": 6,
+   "es_agente": false,
+   "tiene_ejemplos": false,
+   "tiene_cuando": true,
+   "privado": false,
+   "ejemplo": false,
+   "es_local": false,
+   "es": {
+    "entradas": [
+     {
+      "que": "/faseN.md",
+      "nivel": "declarado",
+      "por": "Este flujo es el mismo sin importar desde qué carpeta del repo se invoque ni cuá"
+     },
+     {
+      "que": "task>.md",
+      "nivel": "inferido",
+      "por": "ruta nombrada sin verbo: análisis + fases, tareas con la estructura odd/<feature"
+     }
+    ],
+    "salidas": [
+     {
+      "que": "/faseN.md",
+      "nivel": "declarado",
+      "por": "Para cada fase, crear `odd/<nombre-del-feature>/faseN.md`."
+     },
+     {
+      "que": "faseN.md",
+      "nivel": "declarado",
+      "por": "- Cada `faseN.md` sigue esta plantilla exacta:"
+     }
+    ],
+    "herramientas": [
+     "git"
+    ],
+    "opaca": false
+   }
+  },
+  {
    "nombre": "playwright-cli",
    "ruta": "~/.claude/skills/playwright-cli/SKILL.md",
    "herramienta": "Claude Code",
@@ -4251,7 +4645,7 @@
    "palabras": 1800,
    "kb": 15.3,
    "modificado": "2026-09-24",
-   "dias": 8,
+   "dias": 16,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -4303,11 +4697,6 @@
     ],
     "salidas": [
      {
-      "que": "/i for case-insensitive",
-      "nivel": "declarado",
-      "por": "# wrap the regexp in slashes to add flags, e.g. /i for case-insensitive"
-     },
-     {
       "que": "page.png",
       "nivel": "declarado",
       "por": "playwright-cli screenshot --filename=page.png"
@@ -4328,19 +4717,24 @@
       "por": "playwright-cli --raw eval \"JSON.stringify([...document.querySelectorAll('a')].ma"
      },
      {
-      "que": "10 for Chromium",
+      "que": "before.yml",
       "nivel": "declarado",
-      "por": "# Emulate a generic mobile device (Pixel 10 for Chromium, iPhone 17 for WebKit)."
+      "por": "playwright-cli --raw snapshot > before.yml"
      },
      {
-      "que": "17 for WebKit",
+      "que": "after.yml",
       "nivel": "declarado",
-      "por": "# Emulate a generic mobile device (Pixel 10 for Chromium, iPhone 17 for WebKit)."
+      "por": "playwright-cli --raw snapshot > after.yml"
      },
      {
       "que": "after-click.yaml",
       "nivel": "declarado",
       "por": "playwright-cli snapshot --filename=after-click.yaml"
+     },
+     {
+      "que": "settings-after.png",
+      "nivel": "declarado",
+      "por": "playwright-cli screenshot --filename=settings-after.png"
      }
     ],
     "herramientas": [
@@ -4357,7 +4751,7 @@
    "palabras": 1800,
    "kb": 15.3,
    "modificado": "2026-09-24",
-   "dias": 8,
+   "dias": 16,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -4409,11 +4803,6 @@
     ],
     "salidas": [
      {
-      "que": "/i for case-insensitive",
-      "nivel": "declarado",
-      "por": "# wrap the regexp in slashes to add flags, e.g. /i for case-insensitive"
-     },
-     {
       "que": "page.png",
       "nivel": "declarado",
       "por": "playwright-cli screenshot --filename=page.png"
@@ -4434,19 +4823,24 @@
       "por": "playwright-cli --raw eval \"JSON.stringify([...document.querySelectorAll('a')].ma"
      },
      {
-      "que": "10 for Chromium",
+      "que": "before.yml",
       "nivel": "declarado",
-      "por": "# Emulate a generic mobile device (Pixel 10 for Chromium, iPhone 17 for WebKit)."
+      "por": "playwright-cli --raw snapshot > before.yml"
      },
      {
-      "que": "17 for WebKit",
+      "que": "after.yml",
       "nivel": "declarado",
-      "por": "# Emulate a generic mobile device (Pixel 10 for Chromium, iPhone 17 for WebKit)."
+      "por": "playwright-cli --raw snapshot > after.yml"
      },
      {
       "que": "after-click.yaml",
       "nivel": "declarado",
       "por": "playwright-cli snapshot --filename=after-click.yaml"
+     },
+     {
+      "que": "settings-after.png",
+      "nivel": "declarado",
+      "por": "playwright-cli screenshot --filename=settings-after.png"
      }
     ],
     "herramientas": [
@@ -4463,7 +4857,7 @@
    "palabras": 3306,
    "kb": 21.3,
    "modificado": "2026-09-23",
-   "dias": 9,
+   "dias": 17,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": true,
@@ -4556,10 +4950,10 @@
    "ruta": "~/.claude/skills/synced/b510fdee-d1fa-4db9-911d-d23dc5421ebc_07dd9d7f-fea1-476c-a3aa-1005fe7607aa/pptx/SKILL.md",
    "herramienta": "Claude Code",
    "descripcion": "Use this skill any time a .pptx or .potx file is involved in any way — as input, output, or both. This includes: creating slide decks, pitch decks, or presentations as PowerPoint (.pptx) files; reading, parsing, or extra",
-   "palabras": 3981,
-   "kb": 25.7,
-   "modificado": "2026-10-01",
-   "dias": 1,
+   "palabras": 4385,
+   "kb": 27.9,
+   "modificado": "2026-10-02",
+   "dias": 8,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": true,
@@ -4660,7 +5054,7 @@
    "palabras": 418,
    "kb": 2.7,
    "modificado": "2026-09-30",
-   "dias": 2,
+   "dias": 10,
    "es_agente": false,
    "tiene_ejemplos": false,
    "tiene_cuando": false,
@@ -4695,8 +5089,8 @@
    "descripcion": "Actúa como **revisor de Pull Requests** del vault de {{OWNER}}, en modo equipo. Tu trabajo es que {{OWNER}} pueda revisar el trabajo de otra persona **sin leer un diff crudo**: se lo explicás en el lenguaje del vault (no",
    "palabras": 828,
    "kb": 5.0,
-   "modificado": "2026-08-27",
-   "dias": 36,
+   "modificado": "2026-10-02",
+   "dias": 8,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -4766,8 +5160,8 @@
    "descripcion": "Actúa como auditor de seguridad A DEMANDA del vault de {{OWNER}}. Ayudás a {{OWNER}} a decidir si es seguro **instalar/abrir** algo (un plugin de Obsidian, una skill o hook de Claude Code, un paquete npm/pip, un repo ext",
    "palabras": 653,
    "kb": 4.4,
-   "modificado": "2026-08-27",
-   "dias": 36,
+   "modificado": "2026-10-02",
+   "dias": 8,
    "es_agente": false,
    "tiene_ejemplos": false,
    "tiene_cuando": false,
@@ -4806,9 +5200,9 @@
    "herramienta": "Gemini / Antigravity",
    "descripcion": "Audita la superficie de seguridad del vault (secretos committeados, integridad del .gitignore, hooks y permisos).",
    "palabras": 167,
-   "kb": 1.2,
+   "kb": 1.3,
    "modificado": "2026-10-02",
-   "dias": 0,
+   "dias": 8,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": true,
@@ -4844,7 +5238,7 @@
    "palabras": 5234,
    "kb": 32.6,
    "modificado": "2026-09-23",
-   "dias": 9,
+   "dias": 17,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": true,
@@ -4951,7 +5345,7 @@
    "palabras": 5234,
    "kb": 32.6,
    "modificado": "2026-09-22",
-   "dias": 10,
+   "dias": 18,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": true,
@@ -5058,7 +5452,7 @@
    "palabras": 2069,
    "kb": 15.2,
    "modificado": "2026-09-30",
-   "dias": 2,
+   "dias": 10,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -5164,7 +5558,7 @@
    "palabras": 443,
    "kb": 3.3,
    "modificado": "2026-09-30",
-   "dias": 2,
+   "dias": 10,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -5209,8 +5603,8 @@
    "descripcion": ">",
    "palabras": 903,
    "kb": 5.9,
-   "modificado": "2026-08-27",
-   "dias": 36,
+   "modificado": "2026-10-02",
+   "dias": 8,
    "es_agente": true,
    "tiene_ejemplos": true,
    "tiene_cuando": false,
@@ -5269,9 +5663,9 @@
    "herramienta": "Gemini / Antigravity",
    "descripcion": "Revisa el diff staged antes de un commit y juzga calidad de conocimiento sin modificar archivos.",
    "palabras": 187,
-   "kb": 1.2,
+   "kb": 1.3,
    "modificado": "2026-10-02",
-   "dias": 0,
+   "dias": 8,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": true,
@@ -5307,7 +5701,7 @@
    "palabras": 1312,
    "kb": 8.4,
    "modificado": "2026-09-23",
-   "dias": 9,
+   "dias": 17,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": true,
@@ -5365,7 +5759,7 @@
    "palabras": 1312,
    "kb": 8.4,
    "modificado": "2026-09-22",
-   "dias": 10,
+   "dias": 18,
    "es_agente": false,
    "tiene_ejemplos": true,
    "tiene_cuando": true,
@@ -5417,8 +5811,8 @@
   }
  ],
  "stats_skills": {
-  "canonicas": 31,
-  "todas": 50
+  "canonicas": 35,
+  "todas": 55
  },
  "aristas": [
   [
@@ -5574,7 +5968,14 @@
   "~/.claude/skills/synced/5f2e7e33-a9c2-4625-b5cc-6da2fc30ac42_79cc362b-4985-48bb-a9a9-901e71a5dcf5/skill-creator/agents/analyzer.md": [
    "no dice cuándo se activa"
   ],
+  "~/.claude/skills/synced/b510fdee-d1fa-4db9-911d-d23dc5421ebc_07dd9d7f-fea1-476c-a3aa-1005fe7607aa/built-in-browser/SKILL.md": [
+   "no dice cuándo se activa",
+   "nadie la llama: huérfana (solo la usas tú a mano, si te acuerdas)"
+  ],
   ".agents/skills/check-links/SKILL.md": [
+   "nadie la llama: huérfana (solo la usas tú a mano, si te acuerdas)"
+  ],
+  "~/.claude/skills/synced/b510fdee-d1fa-4db9-911d-d23dc5421ebc_07dd9d7f-fea1-476c-a3aa-1005fe7607aa/chrome-browser/SKILL.md": [
    "nadie la llama: huérfana (solo la usas tú a mano, si te acuerdas)"
   ],
   "~/.claude/skills/synced/5f2e7e33-a9c2-4625-b5cc-6da2fc30ac42_79cc362b-4985-48bb-a9a9-901e71a5dcf5/skill-creator/agents/comparator.md": [
@@ -5585,6 +5986,10 @@
    "nadie la llama: huérfana (solo la usas tú a mano, si te acuerdas)"
   ],
   ".agents/skills/crear-tarea/SKILL.md": [
+   "nadie la llama: huérfana (solo la usas tú a mano, si te acuerdas)"
+  ],
+  "~/.claude/skills/synced/b510fdee-d1fa-4db9-911d-d23dc5421ebc_07dd9d7f-fea1-476c-a3aa-1005fe7607aa/deep-research/SKILL.md": [
+   "no dice cuándo se activa",
    "nadie la llama: huérfana (solo la usas tú a mano, si te acuerdas)"
   ],
   "~/.claude/skills/synced/5f2e7e33-a9c2-4625-b5cc-6da2fc30ac42_79cc362b-4985-48bb-a9a9-901e71a5dcf5/docs/SKILL.md": [
@@ -5642,6 +6047,9 @@
    "no dice cuándo se activa",
    "nadie la llama: huérfana (solo la usas tú a mano, si te acuerdas)"
   ],
+  "~/.agents/skills/phase-implementation-workflow/SKILL.md": [
+   "nadie la llama: huérfana (solo la usas tú a mano, si te acuerdas)"
+  ],
   "~/.claude/skills/playwright-cli/SKILL.md": [
    "no dice cuándo se activa",
    "nadie la llama: huérfana (solo la usas tú a mano, si te acuerdas)"
@@ -5680,107 +6088,7 @@
    "nadie la llama: huérfana (solo la usas tú a mano, si te acuerdas)"
   ]
  },
- "tareas": [
-  {
-   "fuente": "tareas programadas",
-   "cuando": "cada día a las 23:59",
-   "que": "Cerrador de Jornada · Resumen diario de git, notas y bitácora",
-   "cada": "dia",
-   "dia": "",
-   "hora": "23:59",
-   "intervalo": "",
-   "nombre": "Cerrador",
-   "estado": "Ready"
-  },
-  {
-   "fuente": "tareas programadas",
-   "cuando": "cada día a las 02:30",
-   "que": "Mantenimiento Nocturno · Auditoría de scratch, enlaces y mapa",
-   "cada": "dia",
-   "dia": "",
-   "hora": "02:30",
-   "intervalo": "",
-   "nombre": "Mantenedor",
-   "estado": "Ready"
-  },
-  {
-   "fuente": "tareas programadas",
-   "cuando": "cada lunes a las 08:00",
-   "que": "Procesador de Capturas Raw · Escaneo e ingesta de material pendiente",
-   "cada": "semana",
-   "dia": "lunes",
-   "hora": "08:00",
-   "intervalo": "",
-   "nombre": "ProcesadorRaw",
-   "estado": "Ready"
-  },
-  {
-   "fuente": "tareas programadas",
-   "cuando": "cada lunes a las 07:30",
-   "que": "SistemaMaestro-ResumenAgentes",
-   "cada": "semana",
-   "dia": "lunes",
-   "hora": "07:30",
-   "intervalo": "",
-   "nombre": "ResumenAgentes",
-   "estado": "Ready"
-  },
-  {
-   "fuente": "tareas programadas",
-   "cuando": "cada 2h",
-   "que": "Runner Kanban Autónomo · Despacho de tareas desatendidas y Toasts (cada 2h)",
-   "cada": "dia",
-   "dia": "",
-   "hora": "09:00",
-   "intervalo": "2h",
-   "nombre": "RunnerKanban",
-   "estado": "Ready"
-  },
-  {
-   "fuente": "tareas programadas",
-   "cuando": "cada día a las 09:00",
-   "que": "Vigilante del Sistema · Watchdog de salud de tareas y alertas",
-   "cada": "dia",
-   "dia": "",
-   "hora": "09:00",
-   "intervalo": "",
-   "nombre": "Vigilante",
-   "estado": "Ready"
-  },
-  {
-   "fuente": "tareas programadas",
-   "cuando": "cada día a las ",
-   "que": "P508PowerAgent_sdk",
-   "cada": "dia",
-   "dia": "",
-   "hora": "",
-   "intervalo": "",
-   "nombre": "P508PowerAgent_sdk",
-   "estado": "Ready"
-  },
-  {
-   "fuente": "tareas programadas",
-   "cuando": "cada día a las ",
-   "que": "SpaceAgentTask",
-   "cada": "dia",
-   "dia": "",
-   "hora": "",
-   "intervalo": "",
-   "nombre": "SpaceAgentTask",
-   "estado": "Ready"
-  },
-  {
-   "fuente": "tareas programadas",
-   "cuando": "cada día a las 14:14",
-   "que": "Firefox Default Browser Agent 308046B0AF4A39CB",
-   "cada": "dia",
-   "dia": "",
-   "hora": "14:14",
-   "intervalo": "",
-   "nombre": "Firefox Default Browser Agent 308046B0AF4A39CB",
-   "estado": "Ready"
-  }
- ],
+ "tareas": [],
  "dicen": [],
  "sistema": {
   "tablero": true,
@@ -5863,47 +6171,16 @@
   }
  ],
  "actores": {
-  "arneses": [
+  "arneses": [],
+  "canales": [
    {
-    "nombre": "Claude Code",
-    "binario": "claude",
-    "instalado": true,
-    "config": true,
-    "skills": 18,
-    "agentes": 4,
-    "memoria": [
-     "CLAUDE.md"
-    ],
-    "memoria_palabras": 0
-   },
-   {
-    "nombre": "Codex",
-    "binario": "codex",
-    "instalado": true,
-    "config": true,
-    "skills": 5,
-    "agentes": 0,
-    "memoria": [
-     "AGENTS.md",
-     "AGENTS.md"
-    ],
-    "memoria_palabras": 897
-   },
-   {
-    "nombre": "Gemini CLI",
-    "binario": "gemini",
-    "instalado": false,
-    "config": true,
-    "skills": 0,
-    "agentes": 0,
-    "memoria": [],
-    "memoria_palabras": 0
+    "nombre": "Obsidian",
+    "via": "el vault está abierto como bóveda de Obsidian"
    }
   ],
-  "canales": [],
-  "hooks": 22,
+  "hooks": 8,
   "hooks_sh": 0,
-  "mcp": 1,
+  "mcp": 0,
   "notas": [
    {
     "num": "00",
@@ -5949,18 +6226,16 @@
   "sistema_dirs": [
    "00 Sistema"
   ],
-  "carpeta": "sistema-maestro-toolkit",
-  "obsidian": false,
-  "tareas_por_fuente": {
-   "tareas programadas": 9
-  },
+  "carpeta": "ai-vault-template",
+  "obsidian": true,
+  "tareas_por_fuente": {},
   "lanzador": false,
-  "vigilante": true,
+  "vigilante": false,
   "tablero": true,
   "programadas": false,
   "flujos": true,
   "agentes": 4,
-  "skills": 27
+  "skills": 31
  },
  "agentes_reales": [
   {
@@ -5986,6 +6261,7 @@
  "kanban": {
   "pendientes": [],
   "en_progreso": [],
+  "en_revision": [],
   "hecho": [],
   "archivado": [],
   "total": 0
