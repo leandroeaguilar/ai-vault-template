@@ -19,6 +19,7 @@ Ejecutá esta skill para auditar la integridad de los enlaces del vault.
 ## Salidas
 - Emite reporte de enlaces rotos por consola.
 - Genera propuesta de saneamiento o actualiza enlaces con `python .claude/hooks/heal-links.py`.
+- Con `heal-links.py`, corrige los enlaces dentro de las notas de `00 Sistema/` a `06 Raw/` (en el mismo archivo).
 
 ## Herramientas Disponibles
 

@@ -11,6 +11,10 @@
 # Links markdown: destino con `/` se resuelve como ruta relativa al archivo
 # (normaliza ./ y ../); destino de nombre pelado, por nombre (como un wikilink).
 # Solo se chequean destinos .md o sin extensión (los assets png/pdf/… se saltan).
+# Un link markdown también es válido si su ruta resuelve a una CARPETA del vault
+# (p. ej. `<media/>`) o a un archivo dentro de `.claude/` (agentes, scripts):
+# `.claude/` no se escanea, pero sus archivos sí son destinos. Esto vale solo
+# para links markdown por ruta exacta; un [[wikilink]] nunca resuelve por ahí.
 # El tipo de cada roto se marca en la 4ª columna del --tsv: `wiki` | `md`.
 #
 # Diseño: UN SOLO pase de awk para el índice+escaneo (más un pase liviano de
@@ -39,9 +43,13 @@ esac
 PRUNE='-path ./.git -o -path ./.obsidian -o -path ./.claude -o -path ./.vault-meta -o -path ./node_modules'
 PLANTILLAS='./00 Sistema/001_plantillas'
 
-ALL="$(mktemp)"; MDS="$(mktemp)"; ALIAS="$(mktemp)"; BRK="$(mktemp)"
+ALL="$(mktemp)"; MDS="$(mktemp)"; ALIAS="$(mktemp)"; BRK="$(mktemp)"; PATHS="$(mktemp)"
 eval "find . \\( $PRUNE \\) -prune -o -type f -print"            > "$ALL"
 eval "find . \\( $PRUNE -o -path '$PLANTILLAS' \\) -prune -o -type f -name '*.md' -print" > "$MDS"
+# Destinos solo-por-ruta para links markdown: carpetas del vault + archivos de .claude/
+{ eval "find . \( $PRUNE \) -prune -o -type d -print"
+  find ./.claude -name __pycache__ -prune -o -type f -print 2>/dev/null
+} > "$PATHS"
 mapfile -t MDARR < "$MDS"
 
 # --- Aliases del frontmatter (destinos válidos adicionales) ---
@@ -74,9 +82,10 @@ if [ "${#MDARR[@]}" -gt 0 ]; then
 fi
 
 # --- Índice de destinos + escaneo de enlaces (un solo pase de awk) ---
-# Entradas: ALL (rutas) y ALIAS (aliases) construyen el índice; luego se escanea
+# Entradas: ALL (rutas), PATHS (carpetas y .claude/, solo para links markdown) y
+# ALIAS (aliases) construyen el índice; luego se escanea
 # cada .md. Se distingue la fase por FILENAME (sin extensiones de gawk).
-SUMMARY="$(awk -v out="$BRK" -v allf="$ALL" -v aliasf="$ALIAS" '
+SUMMARY="$(awk -v out="$BRK" -v allf="$ALL" -v pathsf="$PATHS" -v aliasf="$ALIAS" '
   function noext(s){ if (match(s, /\.[^.\/]+$/)) return substr(s,1,RSTART-1); return s }
   function add(s){ if (s!="") have[tolower(s)]=1 }
   # normaliza un target relativo (con ./ y ../) al path desde la raíz del vault
@@ -97,6 +106,7 @@ SUMMARY="$(awk -v out="$BRK" -v allf="$ALL" -v aliasf="$ALIAS" '
     add(base); add(noext(base)); add(p); add(noext(p))
     next
   }
+  FILENAME==pathsf { p=$0; sub(/^\.\//,"",p); if (p!="" && p!=".") havep[tolower(p)]=1; next }
   FILENAME==aliasf { add($0); next }
   FNR==1 { infence=0                                  # dir del archivo actual (para rutas md)
     f=FILENAME; sub(/^\.\//,"",f); nf=split(f,fa,"/"); fdir=""
@@ -143,13 +153,13 @@ SUMMARY="$(awk -v out="$BRK" -v allf="$ALL" -v aliasf="$ALIAS" '
       total++
       if (t ~ /\//) key=tolower(normpath(fdir, t))   # ruta -> resolver relativa al archivo
       else key=tolower(t)                            # nombre pelado -> por nombre (Obsidian)
-      if (!(key in have) && !(noext(key) in have)) {
+      if (!(key in have) && !(noext(key) in have) && !(key in havep)) {
         broken++; print f "\t" FNR "\t" t "\t" mdraw "\tmd" > out
       }
     }
   }
   END { printf "check-links: %d enlace(s) roto(s) de %d revisados.", broken+0, total+0 }
-' "$ALL" "$ALIAS" "${MDARR[@]}")"
+' "$ALL" "$PATHS" "$ALIAS" "${MDARR[@]}")"
 
 case "$MODE" in
   pretty)
@@ -171,4 +181,4 @@ case "$MODE" in
     ;;
 esac
 
-rm -f "$ALL" "$MDS" "$ALIAS" "$BRK" 2>/dev/null || true
+rm -f "$ALL" "$MDS" "$ALIAS" "$BRK" "$PATHS" 2>/dev/null || true

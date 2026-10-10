@@ -131,6 +131,141 @@ def regla_cron(expr):
     return "otro", "", hora
 
 
+def salud_windows(item):
+    """Semáforo de una tarea de Windows: ok · falla · nunca · corriendo · pausada (por LastTaskResult y estado)."""
+    if str(item.get("State", "")).lower() == "disabled":
+        return "pausada"
+    res = item.get("LastResult")
+    if res is None or not item.get("LastRun"):
+        return "nunca"
+    if res == 0:
+        return "ok"
+    if res == 0x41301:
+        return "corriendo"
+    if res == 0x41303:
+        return "nunca"
+    return "falla"
+
+
+def _dias_cron(dow):
+    """Campo día-de-semana de cron («*», «1-5», «0,3», «MON-FRI») a conjunto 0..6 (domingo = 0), o None si es «*»."""
+    if dow in ("*", "?"):
+        return None
+    nombres = {"sun": 0, "mon": 1, "tue": 2, "wed": 3, "thu": 4, "fri": 5, "sat": 6}
+    num = lambda x: nombres.get(x.lower()[:3], None) if not x.isdigit() else int(x) % 7
+    out = set()
+    for parte in dow.split(","):
+        if "-" in parte:
+            a, b = (num(x) for x in parte.split("-", 1))
+            if a is None or b is None:
+                return None
+            out.update(range(a, (b if b >= a else b + 7) + 1))
+        else:
+            n = num(parte)
+            if n is None:
+                return None
+            out.add(n)
+    return {d % 7 for d in out}
+
+
+def _rutina(fuente, nombre, cada, dias, dia_mes, hora, que, salud, cuando, **extra):
+    """Normaliza una rutina (local o de la nube) al formato de `tareas` que pinta el calendario."""
+    NOM = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"]
+    t = {"fuente": fuente, "nombre": nombre[:60], "que": que[:200], "hora": hora, "salud": salud, "cuando": cuando, "dia": ""}
+    if cada == "mes":
+        t.update(cada="mes", dia=str(dia_mes))
+    elif dias and len(dias) == 1:
+        t.update(cada="semana", dia=NOM[next(iter(dias))])
+    elif dias and len(dias) < 7:
+        orden = sorted(dias, key=lambda d: (d + 6) % 7)
+        t.update(cada="dia", dias=orden, dias_txt=("lun–vie" if set(dias) == {1, 2, 3, 4, 5} else ", ".join(NOM[d][:3] for d in orden)))
+    else:
+        t.update(cada="dia")
+    t.update({k: v for k, v in extra.items() if v})
+    return t
+
+
+def rutinas_claude_nube(raiz):
+    """Rutinas de Claude en la nube (claude.ai/code → /schedule). El script no puede llamar a esa API (el token OAuth
+    vive dentro de Claude Code), así que lee el snapshot `.vault-meta/rutinas-cloud.json` que refresca la skill /mapa
+    con RemoteTrigger. El cron viene en UTC: se pasa a la hora local de esta máquina."""
+    p = Path(raiz) / ".vault-meta" / "rutinas-cloud.json"
+    try:
+        snap = json.loads(p.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return []
+    off = dt.datetime.now().astimezone().utcoffset() or dt.timedelta(0)
+    off_min = int(off.total_seconds() // 60)
+    salud_de = {"ROUTINE_RUN_STATUS_SUCCEEDED": "ok", "ROUTINE_RUN_STATUS_FAILED": "falla", "ROUTINE_RUN_STATUS_RUNNING": "corriendo"}
+    out = []
+    for r in snap.get("rutinas", []):
+        try:
+            mi, ho, dom, _mon, dow = r.get("cron", "").split()[:5]
+        except ValueError:
+            continue
+        hora, corrimiento = "", 0
+        if mi.isdigit() and ho.isdigit():
+            total = int(ho) * 60 + int(mi) + off_min
+            corrimiento, resto = divmod(total, 24 * 60)
+            hora = f"{resto // 60:02d}:{resto % 60:02d}"
+        dias = _dias_cron(dow)
+        if dias is not None:
+            dias = {(d + corrimiento) % 7 for d in dias}
+        salud = "pausada" if not r.get("habilitada", True) else salud_de.get(r.get("estado_ultima", ""), "nunca")
+        es_mes = dom.isdigit() and dow in ("*", "?")
+        cuando = f"cron {r.get('cron')} UTC"
+        out.append(_rutina("Claude (nube)", r.get("nombre", "rutina"), "mes" if es_mes else "dia", dias, (int(dom) + corrimiento) if es_mes else "", hora,
+                           r.get("que", ""), salud, cuando, ultima=_local(r.get("ultima")), proxima=_local(r.get("proxima")), url=r.get("url", "")))
+    return out
+
+
+def _local(iso):
+    """ISO UTC («2026-10-05T12:09:32.65Z») a «2026-10-05T09:09» en hora local; vacío si no se entiende."""
+    if not iso:
+        return ""
+    try:
+        return dt.datetime.fromisoformat(iso[:19] + "+00:00").astimezone().strftime("%Y-%m-%dT%H:%M")
+    except ValueError:
+        return ""
+
+
+def rutinas_externas(raiz):
+    """Rutinas de otras plataformas sin API para listarlas (Gemini «acciones programadas», ChatGPT «tareas»):
+    se cargan a mano en la tabla de `01 Index/Registro de Rutinas Externas.md`.
+    Columnas: Plataforma | Rutina | Cadencia (diaria · lun-vie · semanal · mensual) | Día | Hora | Qué hace | Activa.
+    Vive en 01 Index y no en 00 Sistema: 00 Sistema es framework y update.sh lo pisaría con la tabla vacía."""
+    texto = None
+    for capa in ("01 Index", "00 Sistema"):
+        try:
+            texto = (Path(raiz) / capa / "Registro de Rutinas Externas.md").read_text(encoding="utf-8")
+            break
+        except OSError:
+            pass
+    if texto is None:
+        return []
+    NOM = {"domingo": 0, "lunes": 1, "martes": 2, "miercoles": 3, "miércoles": 3, "jueves": 4, "viernes": 5, "sabado": 6, "sábado": 6}
+    out = []
+    for ln in texto.splitlines():
+        celdas = [c.strip() for c in ln.strip().strip("|").split("|")]
+        if len(celdas) < 7 or not ln.lstrip().startswith("|") or celdas[0].lower() in ("plataforma", "") or set(celdas[0]) <= set("-: "):
+            continue
+        plat, nombre, cad, dia, hora, que, activa = celdas[:7]
+        cad = cad.lower()
+        dias, cada, dia_mes = None, "dia", ""
+        if cad.startswith("lun"):
+            dias = {1, 2, 3, 4, 5}
+        elif cad.startswith("seman"):
+            n = NOM.get(dia.lower())
+            if n is None:
+                continue
+            dias = {n}
+        elif cad.startswith("mens"):
+            cada, dia_mes = "mes", dia
+        salud = "pausada" if activa.lower() in ("no", "❌", "pausada") else "externa"
+        out.append(_rutina(plat, nombre, cada, dias, dia_mes, hora.zfill(5) if re.fullmatch(r"\d{1,2}:\d{2}", hora) else "", que, salud, f"{cad} {dia} {hora}".strip()))
+    return out
+
+
 def cron_y_launchd():
     tareas = []
     try:
@@ -162,13 +297,13 @@ def cron_y_launchd():
     if sys.platform.startswith("win"):
         try:
             ps_script = """
-            $tasks = Get-ScheduledTask | Where-Object { $_.TaskName -match '(?i)SistemaMaestro|Claude|Agent' }
+            $tasks = Get-ScheduledTask -TaskName 'SistemaMaestro-*' -ErrorAction SilentlyContinue
             $list = @()
             foreach ($t in $tasks) {
-                if ($t.TaskName -match '(?i)SpacePort|Mozilla|ASUS|Edge') { continue }
                 $tr = $t.Triggers[0]
                 $action = $t.Actions[0]
                 $execStr = if ($action) { "$($action.Execute) $($action.Arguments)" } else { "" }
+                $info = Get-ScheduledTaskInfo -TaskName $t.TaskName -ErrorAction SilentlyContinue
                 $list += [PSCustomObject]@{
                     Name = $t.TaskName
                     State = [string]$t.State
@@ -177,6 +312,9 @@ def cron_y_launchd():
                     DaysOfWeek = [string]$tr.DaysOfWeek
                     Trigger = $tr.CimClass.CimClassName
                     Exec = $execStr
+                    LastRun = if ($info -and $info.LastRunTime.Year -gt 2000) { $info.LastRunTime.ToString('yyyy-MM-ddTHH:mm') } else { '' }
+                    NextRun = if ($info -and $info.NextRunTime) { $info.NextRunTime.ToString('yyyy-MM-ddTHH:mm') } else { '' }
+                    LastResult = if ($info) { [int64]$info.LastTaskResult } else { $null }
                 }
             }
             $list | ConvertTo-Json -Compress
@@ -211,6 +349,8 @@ def cron_y_launchd():
                             desc_amigable = "Runner Kanban Autónomo · Despacho de tareas desatendidas y Toasts"
                         elif "Vigilante" in nom:
                             desc_amigable = "Vigilante del Sistema · Watchdog de salud de tareas y alertas"
+                        elif "ResumenAgentes" in nom:
+                            desc_amigable = "Resumen Semanal de Agentes · Balance de rendimiento del enjambre y Kanban"
 
                         if "MSFT_TaskDailyTrigger" in tr_type:
                             cada = "dia"
@@ -232,7 +372,10 @@ def cron_y_launchd():
                             "hora": hora,
                             "intervalo": interval.replace("PT", "").replace("H", "h").replace("M", "m") if interval else "",
                             "nombre": limpio_nom,
-                            "estado": item.get("State", "Ready")
+                            "estado": item.get("State", "Ready"),
+                            "ultima": item.get("LastRun") or "",
+                            "proxima": item.get("NextRun") or "",
+                            "salud": salud_windows(item),
                         })
                 except Exception:
                     pass
@@ -338,12 +481,20 @@ def entradas_salidas(s):
         clave = clave[:90]
         if clave and (clave not in dic or ["supuesto", "inferido", "declarado"].index(nivel) > ["supuesto", "inferido", "declarado"].index(dic[clave][0])):
             dic[clave] = (nivel, por[:80])
+    seccion = None   # «in» / «out» bajo un título ## Entradas / ## Salidas (contrato Nexus): manda el título, no el verbo
     for ln in lineas:
         low = ln.lower()
+        h = re.match(r"\s*#{1,6}\s+(.*)", ln)
+        if h:
+            th = h.group(1).lower()
+            seccion = "in" if re.search(r"entradas?\b|inputs?\b", th) else "out" if re.search(r"salidas?\b|outputs?\b", th) else None
+            continue
         lee = re.search(V_LEE, low); esc = re.search(V_ESC, low)
         rutas = [r for r in (_limpia(m.group(0)) for m in RE_RUTA.finditer(ln)) if r]
         for r in rutas:
-            if esc and (not lee or esc.start() < lee.start()):
+            if seccion:
+                pon(entradas if seccion == "in" else salidas, r, "declarado", ln.strip())
+            elif esc and (not lee or esc.start() < lee.start()):
                 pon(salidas, r, "declarado", ln.strip())
             elif lee:
                 pon(entradas, r, "declarado", ln.strip())
@@ -739,11 +890,11 @@ def detectar_actores(raiz, skills, tareas, sistema, solo_carpeta=False):
 
 def leer_kanban(raiz: Path) -> dict:
     kanban_dir = raiz / "03 Proyectos" / "Kanban"
-    kanban = {"pendientes": [], "en_progreso": [], "hecho": [], "archivado": [], "total": 0}
+    kanban = {"pendientes": [], "en_progreso": [], "en_revision": [], "hecho": [], "archivado": [], "total": 0}
     if not kanban_dir.exists():
         return kanban
     
-    for col, key in [("Pendientes", "pendientes"), ("En_Progreso", "en_progreso"), ("Hecho", "hecho"), ("Archivado", "archivado")]:
+    for col, key in [("Pendientes", "pendientes"), ("En_Progreso", "en_progreso"), ("En_Revision", "en_revision"), ("Hecho", "hecho"), ("Archivado", "archivado")]:
         d = kanban_dir / col
         if d.exists():
             for f in sorted(d.glob("*.md"), key=lambda p: p.stat().st_mtime, reverse=True):
@@ -771,7 +922,7 @@ def leer_kanban(raiz: Path) -> dict:
                     "objetivo": obj[:180],
                     "cuerpo": cuerpo[:1500].strip()
                 })
-    kanban["total"] = len(kanban["pendientes"]) + len(kanban["en_progreso"]) + len(kanban["hecho"]) + len(kanban["archivado"])
+    kanban["total"] = sum(len(kanban[k]) for k in ("pendientes", "en_progreso", "en_revision", "hecho", "archivado"))
     return kanban
 
 
@@ -1035,6 +1186,8 @@ tr:hover td{background:color-mix(in srgb,var(--tarjeta-hover) 35%,transparent)}
 .cal-caja li.virtual{opacity:.6;font-style:italic}
 .cal-caja .nada{color:var(--gris);font-size:.76rem;font-style:italic}
 @media (max-width:760px){.cal-resumen{grid-template-columns:1fr}}
+.sem{display:inline-block;width:8px;height:8px;border-radius:50%;margin:0 6px 1px 2px;vertical-align:middle;background:var(--sem-c,#999)}
+.sem.ok{--sem-c:#2F7D4F}.sem.falla{--sem-c:#C0392B}.sem.nunca{--sem-c:#B08A1E}.sem.corriendo{--sem-c:#3D6296}.sem.pausada{--sem-c:#8A8A8A}.sem.externa{--sem-c:transparent;box-shadow:inset 0 0 0 1.5px #8A8A8A}
 .cal-cabecera{display:flex;align-items:center;gap:10px;margin:4px 0 8px}
 .cal-mes{font:600 1.1rem var(--mono);margin:0;min-width:180px;text-transform:capitalize}
 .cal-nav,.cal-hoy{font:600 .85rem var(--mono);border:1px solid var(--linea);background:var(--tarjeta);color:var(--tinta);border-radius:6px;padding:4px 10px;cursor:pointer;transition:all .15s ease}
@@ -1293,7 +1446,7 @@ tr:hover td{background:color-mix(in srgb,var(--tarjeta-hover) 35%,transparent)}
 <nav class="pestanas" role="tablist">
   <button role="tab" aria-selected="true" data-v="kanban">Tablero Kanban</button>
   <button role="tab" aria-selected="false" data-v="roadmap">Roadmap Sistema</button>
-  <button role="tab" aria-selected="false" data-v="cal">Calendario &amp; Agenda</button>
+  <button role="tab" aria-selected="false" data-v="cal">Rutinas &amp; Calendario</button>
   <button role="tab" aria-selected="false" data-v="skills">Skills &amp; Contratos</button>
   <button role="tab" aria-selected="false" data-v="agentes">Agentes del Sistema</button>
   <button role="tab" aria-selected="false" data-v="actores">Arquitectura Vault</button>
@@ -1390,6 +1543,7 @@ tr:hover td{background:color-mix(in srgb,var(--tarjeta-hover) 35%,transparent)}
         <div class="vc-move-group">
           <button type="button" class="mc-btn vc-move-btn" data-to="pendientes" id="vc-move-pend">📥 A Pendiente</button>
           <button type="button" class="mc-btn vc-move-btn" data-to="en_progreso" id="vc-move-prog">⚙️ En Progreso</button>
+          <button type="button" class="mc-btn vc-move-btn" data-to="en_revision" id="vc-move-rev">👀 En Revisión</button>
           <button type="button" class="mc-btn vc-move-btn" data-to="hecho" id="vc-move-hecho">✅ Hecho</button>
           <button type="button" class="mc-btn vc-move-btn" data-to="archivado" id="vc-move-arch">📦 Archivar</button>
         </div>
@@ -1450,7 +1604,7 @@ tr:hover td{background:color-mix(in srgb,var(--tarjeta-hover) 35%,transparent)}
     <div id="sk-cadenas-lista" class="lista-flujos"></div>
   </div>
 </section>
-<section id="v-cal" hidden><p class="sub"><b>Agentes y tareas programadas en esta máquina</b>: Barriendo el Programador de Tareas de Windows (Task Scheduler), cron y programaciones declaradas en skills. Haz clic en cualquier día para inspeccionar el cronograma horario detallado.</p>
+<section id="v-cal" hidden><p class="sub"><b>Rutinas: todo lo que corre solo</b>. En esta máquina (Programador de Tareas de Windows <code>SistemaMaestro-*</code>, cron, lo declarado en skills), en la nube de Claude (<code>/schedule</code>, snapshot que refresca <code>/mapa</code>) y en otras plataformas (Gemini, ChatGPT: <code>01 Index/Registro de Rutinas Externas.md</code>). Horas en hora local. Semáforo: <span class="sem ok"></span>última corrida bien · <span class="sem falla"></span>falló · <span class="sem nunca"></span>sin corridas · <span class="sem pausada"></span>pausada · <span class="sem externa"></span>sin datos (registro manual). Clic en un día para ver su agenda.</p>
   <div class="cal-resumen" id="cal-resumen" aria-label="Lo programado, por cadencia"></div>
   <div class="cal-cabecera"><button type="button" class="cal-nav" id="cal-prev" aria-label="Mes anterior">‹</button><h3 class="cal-mes" id="cal-mes"></h3><button type="button" class="cal-nav" id="cal-next" aria-label="Mes siguiente">›</button><button type="button" class="cal-hoy" id="cal-hoy">hoy</button></div>
   <div class="cal-semana"><span>lun</span><span>mar</span><span>mié</span><span>jue</span><span>vie</span><span>sáb</span><span>dom</span></div>
@@ -1694,14 +1848,16 @@ function tarjetaFlujo(f, fantasma){
 const PALETA = ["#B4642E","#3D6296","#2F7D4F","#8B3A62","#8A6A1F","#2C7A75","#6B4E96","#4E6B73"];
 const colorDe = (() => { const m = {}; let i = 0; return n => (n in m ? m[n] : (m[n] = PALETA[i++ % PALETA.length])); })();
 const DIAS = {"lunes":1,"martes":2,"miércoles":3,"jueves":4,"viernes":5,"sábado":6,"domingo":0};
-const PROGS = D.tareas.filter(t => t.cada && t.cada !== "otro").map(t => ({nombre: t.nombre || t.que.slice(0, 30), cada: t.cada, dia: t.dia, hora: t.hora, quien: t.fuente, que: t.que, virtual: false, declarada: false}))
+const PROGS = D.tareas.filter(t => t.cada && t.cada !== "otro").map(t => ({...t, nombre: t.nombre || t.que.slice(0, 30), quien: t.fuente, virtual: false, declarada: false}))
   .concat(D.dicen.filter(x => x.cada && x.cada !== "otro").map(x => ({nombre: x.skill, cada: x.cada, dia: x.dia, hora: x.hora, quien: "declarada en la skill", ej: !!(D.skills.find(s => s.nombre === x.skill) || {}).ejemplo, que: `La skill dice «${x.dice}»${x.hora ? '' : ' (sin hora: se pinta al final del día)'}; nadie la lanza desde cron o launchd, que se sepa. ` + (x.que || ''), virtual: false, declarada: true})))
   .concat(D.ejemplos_cron.filter(e => !D.tareas.some(t => (t.nombre||"").includes(e.nombre)) && !D.dicen.some(x => x.skill === e.nombre || x.skill === e.quien)).map(e => ({...e, virtual: true, declarada: false})));
 PROGS.forEach(p => colorDe(p.virtual ? "ejemplo" : p.quien));
 let calAno, calMes;
 const hoyStr = (() => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); })();
 const fechaStr = (a, m, d) => a + "-" + String(m + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0");
-function tocaEse(p, a, m, d){ if (p.cada === "dia") return true; const dow = new Date(a, m, d).getDay(); if (p.cada === "semana") return DIAS[p.dia] === dow; if (p.cada === "mes") return String(d) === String(parseInt(p.dia, 10)); return false; }
+const SEM_TXT = {ok: "última corrida bien", falla: "la última corrida falló", nunca: "todavía sin corridas", corriendo: "corriendo ahora", pausada: "pausada / desactivada", externa: "registro manual: sin datos de corridas"};
+const semaforo = p => p.salud ? `<span class="sem ${p.salud}" title="${escT(SEM_TXT[p.salud] || p.salud)}${p.ultima ? ' · última ' + escT(p.ultima.replace('T', ' ')) : ''}${p.proxima ? ' · próxima ' + escT(p.proxima.replace('T', ' ')) : ''}"></span>` : "";
+function tocaEse(p, a, m, d){ const dow = new Date(a, m, d).getDay(); if (p.dias) return p.dias.includes(dow); if (p.cada === "dia") return true; if (p.cada === "semana") return DIAS[p.dia] === dow; if (p.cada === "mes") return String(d) === String(parseInt(p.dia, 10)); return false; }
 const DIAS_NOMBRE = {1: "lunes", 2: "martes", 3: "miércoles", 4: "jueves", 5: "viernes", 6: "sábado", 0: "domingo"};
 let calDiaSel = null;
 
@@ -1768,10 +1924,10 @@ function pintarTimelineDia(a, m, d){
       <div class="cal-tl-time">${escT(horaTxt)}</div>
       <div class="cal-tl-info">
         <div class="cal-tl-name">
-          <span>${escT(p.nombre)}</span>
-          <span class="cal-tl-cadencia">${p.cada === 'semana' ? 'Semanal' : (esIntradia ? 'Intradía (repetitivo)' : 'Diario')}</span>
+          <span>${semaforo(p)}${p.url ? `<a href="${escT(p.url)}" target="_blank" rel="noopener" style="color:inherit">${escT(p.nombre)}</a>` : escT(p.nombre)}</span>
+          <span class="cal-tl-cadencia">${p.cada === 'semana' ? 'Semanal' : p.cada === 'mes' ? 'Mensual' : p.dias_txt ? escT(p.dias_txt) : (esIntradia ? 'Intradía (repetitivo)' : 'Diario')}</span>
         </div>
-        <div class="cal-tl-desc">${escT(p.que)}</div>
+        <div class="cal-tl-desc">${escT(p.que)}${(p.ultima || p.proxima) ? `<br><small>${p.ultima ? 'última: ' + escT(p.ultima.replace('T', ' ')) : ''}${p.ultima && p.proxima ? ' · ' : ''}${p.proxima ? 'próxima: ' + escT(p.proxima.replace('T', ' ')) : ''}</small>` : ''}</div>
       </div>
       <div class="cal-tl-source">${escT(p.quien)}</div>
     </div>`;
@@ -1797,8 +1953,8 @@ function pintarTimelineDia(a, m, d){
 /* Las tres cajas de arriba: todo lo programado junto, por cadencia. */
 function pintarResumenCal(){
   const caja = $("#cal-resumen"); if (!caja || caja.dataset.ok) return; caja.dataset.ok = "1";
-  const cuando = p => p.cada === "semana" ? (p.dia ? "cada " + p.dia : "cada semana") : p.cada === "mes" ? (p.dia ? "el día " + p.dia : "cada mes") : (p.intervalo ? "cada " + p.intervalo : "cada día");
-  const fila = p => `<li class="${p.virtual ? "virtual" : ""}" data-globo="${escT((p.hora || "??:??") + " · " + p.nombre + " · " + p.quien + "\n" + (p.que || ""))}" tabindex="0"><span class="h">${escT(p.hora || "—")}</span><span class="n">${escT(p.nombre)}${p.cada !== "dia" || p.intervalo ? ` <span class="q">${escT(cuando(p))}</span>` : ""}${(p.virtual || p.ej) ? '<span class="ej">ejemplo</span>' : ""}</span></li>`;
+  const cuando = p => p.cada === "semana" ? (p.dia ? "cada " + p.dia : "cada semana") : p.cada === "mes" ? (p.dia ? "el día " + p.dia : "cada mes") : (p.intervalo ? "cada " + p.intervalo : p.dias_txt || "cada día");
+  const fila = p => `<li class="${p.virtual ? "virtual" : ""}" data-globo="${escT((p.hora || "??:??") + " · " + p.nombre + " · " + p.quien + (p.salud ? " · " + (SEM_TXT[p.salud] || p.salud) : "") + (p.ultima ? "\núltima: " + p.ultima.replace("T", " ") : "") + (p.proxima ? "\npróxima: " + p.proxima.replace("T", " ") : "") + "\n" + (p.que || ""))}" tabindex="0"><span class="h">${escT(p.hora || "—")}</span><span class="n">${semaforo(p)}${escT(p.nombre)}${p.cada !== "dia" || p.intervalo || p.dias_txt ? ` <span class="q">${escT(cuando(p))}</span>` : ""}${p.fuente && p.fuente !== "tareas programadas" ? ` <span class="q">· ${escT(p.fuente)}</span>` : ""}${(p.virtual || p.ej) ? '<span class="ej">ejemplo</span>' : ""}</span></li>`;
   const grupo = (et, cada) => { const xs = PROGS.filter(p => p.cada === cada).sort((x, y) => (x.virtual - y.virtual) || (x.hora || "99").localeCompare(y.hora || "99"));
     return `<div class="cal-caja"><h4><b>${xs.filter(x => !x.virtual).length}</b>${et}</h4>${xs.length ? `<ul>${xs.map(fila).join("")}</ul>` : `<p class="nada">ninguna</p>`}</div>`; };
   caja.innerHTML = grupo("diarias / intradía", "dia") + grupo("semanales", "semana") + grupo("mensuales", "mes");
@@ -2153,6 +2309,7 @@ function pintarKanban(){
   const cols = [
     {id: "pendientes", nombre: "📥 Pendientes", items: D.kanban.pendientes || []},
     {id: "en_progreso", nombre: "⚙️ En Progreso", items: D.kanban.en_progreso || []},
+    {id: "en_revision", nombre: "👀 En Revisión", items: D.kanban.en_revision || []},
     {id: "hecho", nombre: "✅ Hecho", items: D.kanban.hecho || []}
   ];
   const el = $("#kb-tablero");
@@ -2524,7 +2681,7 @@ def recolectar_datos(raiz, sin_maquina=False, enlace=""):
     skills = skills_canonicas
     aristas = relaciones(skills)
     avisos = semaforo(skills, aristas)
-    tareas = [] if sin_maquina else cron_y_launchd()
+    tareas = [] if sin_maquina else cron_y_launchd() + rutinas_claude_nube(raiz) + rutinas_externas(raiz)
     dicen = programadas_en_texto(skills)
     sistema = detectar_sistema(raiz)
     flujos = leer_flujos_yml(raiz)
@@ -2627,7 +2784,7 @@ class MissionControlHandler(http.server.BaseHTTPRequestHandler):
             roadmap_data = datos.get("roadmap") or {}
             secciones_lst = roadmap_data.get("secciones") or (roadmap_data.get("stats") or {}).get("secciones") or []
             kb_data = datos.get("kanban") or {}
-            kb_tot = len(kb_data.get("pendientes", [])) + len(kb_data.get("en_progreso", [])) + len(kb_data.get("hecho", []))
+            kb_tot = sum(len(kb_data.get(k, [])) for k in ("pendientes", "en_progreso", "en_revision", "hecho"))
             res = {
                 "ok": True,
                 "version": datos["version"],
@@ -2689,13 +2846,17 @@ class MissionControlHandler(http.server.BaseHTTPRequestHandler):
             filename = f"{today} - {slug}.md"
             target_path = self.server.raiz / "03 Proyectos" / "Kanban" / "Pendientes" / filename
             
+            # El dueño sale del archivo de identidad (gitignorado); sin él, un nombre neutro.
+            ident = self.server.raiz / "owner.env"
+            m = re.search(r'^OWNER="?([^"\n]*)', ident.read_text(encoding="utf-8"), re.M) if ident.exists() else None
+            dueno = m.group(1).strip() if m else "dueño del vault"
             card_content = f"""---
 type: Project
 title: "{title}"
 tags: [kanban, tarea]
 estado: 📥 Pendiente
 prioridad: {prioridad}
-responsable: "Leandro Esteban Aguilar Montilla"
+responsable: "{dueno}"
 agent: {agent}
 skill: {skill}
 fecha_creacion: {today}
@@ -2748,6 +2909,7 @@ id: "KB-{dt.datetime.now().strftime('%Y%m%d%H%M%S')}"
             col_map = {
                 "pendientes": "Pendientes",
                 "en_progreso": "En_Progreso",
+                "en_revision": "En_Revision",
                 "hecho": "Hecho",
                 "archivado": "Archivado"
             }
@@ -2774,6 +2936,7 @@ id: "KB-{dt.datetime.now().strftime('%Y%m%d%H%M%S')}"
                 estado_str = {
                     "pendientes": "📥 Pendiente",
                     "en_progreso": "⚙️ En Progreso",
+                    "en_revision": "👀 En Revisión",
                     "hecho": "✅ Hecho",
                     "archivado": "📦 Archivado"
                 }.get(to_col, to_col)

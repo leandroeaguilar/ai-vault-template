@@ -9,6 +9,21 @@ contra el del upstream para decidir si una instancia está atrasada — por eso 
 
 ---
 
+## [0.8.0] — 2026-10-10
+
+Rutinas a la vista en el mapa y una columna para lo que espera tu revisión.
+
+### Agregado
+- **Pestaña «Rutinas & Calendario»** en `Mapa de mis agentes.html` (antes «Calendario»): semáforo por rutina (bien · falló · sin corridas · pausada), tareas `SistemaMaestro-*` del Programador de Tareas de Windows con su última corrida y resultado, rutinas de Claude en la nube (snapshot `.vault-meta/rutinas-cloud.json`) y rutinas de Gemini/ChatGPT cargadas a mano.
+- **`01 Index/Registro de Rutinas Externas.md`** (scaffold): la tabla para las rutinas de plataformas sin API. Es tuya: `update.sh` no la pisa.
+- **Columna `03 Proyectos/Kanban/En_Revision/`** (scaffold): recibos y entregables de agentes que esperan tu visto bueno. El tablero del mapa la muestra y permite mover tarjetas ahí.
+- **`.claude/scripts/abrir-mapa.cmd`**: levanta el servidor del mapa si no está corriendo y abre el navegador. Hacele un acceso directo en el escritorio y no tenés que recordar el comando.
+
+### Cambiado
+- El mapa lee los contratos por sección: bajo `## Entradas` / `## Salidas` la ruta cuenta de ese lado, sin adivinar por el verbo; los títulos ya no se leen como rutas.
+- `check-links.sh` deja de dar por rotos los links markdown a carpetas del vault y a archivos de `.claude/`.
+- Las tarjetas creadas desde el mapa llevan como `responsable` el `OWNER` de tu archivo de identidad, no un nombre fijo.
+
 ## [0.7.0] — 2026-10-02
 
 Arquitectura multi-agente universal, Headless Kanban con patrón de recibos humanos y mapa visual de observabilidad.

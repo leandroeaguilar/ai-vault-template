@@ -24,6 +24,7 @@ En lugar de requerir una sesión de chat abierta continua, cualquier actor (huma
 
 - **`Pendientes/`**: Tarjetas creadas a la espera de ejecución o atención.
 - **`En_Progreso/`**: Tarjetas que se están procesando actualmente.
+- **`En_Revision/`**: Tarjetas que esperan tu visto bueno: un recibo o un entregable de un agente. Si está bien, pasala a `Hecho/`; si no, devolvela a `Pendientes/` con una nota.
 - **`Hecho/`**: Tarjetas completadas con su informe o recibo de ejecución.
 - **`Archivado/`**: Tarjetas históricas archivadas.
 
@@ -40,7 +41,7 @@ title: "Revisar enlaces tras mover notas"
 agent: mantenedor     # o verifier, general
 skill: check-links    # skill a invocar
 prioridad: 🟡 Media   # 🔥 Alta, 🟡 Media, 🟢 Baja
-estado: 📥 Pendiente  # 📥 Pendiente, ⚙️ En Progreso, ✅ Hecho, ⚠️ Error
+estado: 📥 Pendiente  # 📥 Pendiente, ⚙️ En Progreso, 👀 En revisión, ✅ Hecho, ⚠️ Error
 recibo: false         # true si es un recibo para validación humana
 fecha_creacion: YYYY-MM-DD
 ---
