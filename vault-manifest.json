@@ -11,6 +11,8 @@
     ".gitattributes",
     ".github/workflows/verify.yml",
     ".github/workflows/aviso-de-pr.yml",
+    ".github/workflows/tests.yml",
+    "tests/**",
     ".gitignore",
     "00 Sistema/**",
     "01 Index/.gitkeep",

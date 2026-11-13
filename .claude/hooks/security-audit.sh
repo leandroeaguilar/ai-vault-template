@@ -72,12 +72,11 @@ for must in ".vault-meta/" "settings.local.json"; do
   fi
 done
 # Verificación dura: que lo sensible NO esté trackeado.
-for leak in ".claude/settings.local.json"; do
-  if git ls-files --error-unmatch "$leak" >/dev/null 2>&1; then
-    say "🔴 FUGA: $leak está TRACKEADO en git."
-    hits_gitignore=$((hits_gitignore + 1))
-  fi
-done
+leak=".claude/settings.local.json"
+if git ls-files --error-unmatch "$leak" >/dev/null 2>&1; then
+  say "🔴 FUGA: $leak está TRACKEADO en git."
+  hits_gitignore=$((hits_gitignore + 1))
+fi
 if git ls-files 2>/dev/null | grep -q '^\.vault-meta/'; then
   say "🔴 FUGA: hay archivos de .vault-meta/ trackeados."
   hits_gitignore=$((hits_gitignore + 1))

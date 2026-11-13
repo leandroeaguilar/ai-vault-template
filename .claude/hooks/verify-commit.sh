@@ -5,10 +5,14 @@
 # del sistema ANTES de que entren a la historia. Es la "última compuerta barata".
 # Ver concepto en el README, sección Verifier. Sin jq, sin node.
 #
-# Qué valida (solo docs en zonas donde el frontmatter es obligatorio):
-#   ERROR   — falta alguno de los 4 campos obligatorios (tipo_doc, estado,
-#             ultima_revision, id) o no hay frontmatter.  (convención del vault privado; ver README)
-#   AVISO   — tags no en formato [a, b] minúsculas sin '#'.
+# Qué valida (solo docs en zonas donde el frontmatter es obligatorio). Es el
+# contrato de SOP Documentación §4.1 — si cambia uno, cambia el otro:
+#   ERROR   — no hay frontmatter, o falta alguno de los 4 campos obligatorios:
+#             type · estado · generated · id.
+#             (Se aceptan los nombres previos a OKF: tipo_doc por type;
+#             ultima_revision o timestamp por generated.)
+#   AVISO   — sin title · sin description · tags con '#'.
+# Tests: tests/test_verify_commit.py.
 #
 # Modo:
 #   Por defecto WARN-ONLY (exit 0 siempre): reporta pero NO frena. Así no obliga
@@ -60,11 +64,15 @@ staged() {
 }
 
 # Lista de archivos a verificar, según el modo.
+# ACMR con la R: un archivo renombrado y editado sale como R(ename), no como M.
+# quotepath=false: sin esto git entrecomilla y escapa las rutas con tilde
+# ("…Automatizaci\303\263n/X.md"), el nombre deja de terminar en .md y la nota
+# se SALTEABA en silencio: las carpetas acentuadas nunca se verificaban.
 changed_files() {
   if [ -n "$RANGE_BASE" ]; then
-    git diff --name-only --diff-filter=ACM "$RANGE_BASE...$RANGE_HEAD" 2>/dev/null
+    git -c core.quotepath=false diff --name-only --diff-filter=ACMR "$RANGE_BASE...$RANGE_HEAD" 2>/dev/null
   else
-    git diff --cached --name-only --diff-filter=ACM 2>/dev/null
+    git -c core.quotepath=false diff --cached --name-only --diff-filter=ACMR 2>/dev/null
   fi
 }
 
@@ -90,7 +98,7 @@ while IFS= read -r f; do
   # Dual-key OKF: acepta la clave propia O su equivalente OKF (tipo_doc|type,
   # ultima_revision|timestamp) durante la transición. OKF v0.2: `generated:`
   # (bloque {by, at}) reemplaza a `timestamp`; se acepta cualquiera de los tres.
-  printf '%s\n' "$fm" | grep -qE '^(tipo_doc|type):' || miss="${miss} tipo_doc"
+  printf '%s\n' "$fm" | grep -qE '^(tipo_doc|type):' || miss="${miss} type"
   printf '%s\n' "$fm" | grep -qE '^estado:' || miss="${miss} estado"
   printf '%s\n' "$fm" | grep -qE '^(ultima_revision|timestamp|generated):' || miss="${miss} generated"
   printf '%s\n' "$fm" | grep -qE '^id:' || miss="${miss} id"
@@ -102,6 +110,14 @@ while IFS= read -r f; do
   # Aviso: tags con '#'. Cubre inline (tags: [#x]) y multilínea (- "#x").
   if printf '%s\n' "$fm" | grep -qE '(^tags:.*#|^[[:space:]]*-[[:space:]]*["'"'"']?#)'; then
     report="${report}  ⚠ ${f}: tags con '#' (usar [a, b] sin '#')\n"
+    warns=$((warns+1))
+  fi
+
+  # Aviso: sin title (OKF; = H1). Warn-only, igual que description (SOP §4.1).
+  if ! printf '%s
+' "$fm" | grep -qE '^title:'; then
+    report="${report}  ⚠ ${f}: sin title (OKF — debe coincidir con el H1)
+"
     warns=$((warns+1))
   fi
 

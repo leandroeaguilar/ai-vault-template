@@ -1,0 +1,91 @@
+# Tests de las GUARDAS — que los controles sigan controlando.
+#
+# No es lo mismo que `verify.yml`. Aquel corre las guardas sobre el CONTENIDO de
+# un PR (¿trae un secreto?, ¿pisa un bloque @user?). Este prueba las guardas
+# MISMAS: que bloqueen lo que tienen que bloquear y dejen pasar lo demás.
+#
+# Por qué hace falta: casi todos los hooks son fail-open por diseño — ante un
+# error, permiten. Una guarda rota no falla: deja pasar, en silencio. Sin tests,
+# la primera señal de un security-guard roto es el incidente.
+#
+# Corre también en `push` a la rama principal: en un vault personal el dueño
+# commitea directo a main y ahí no hay PR que dispare nada.
+#
+# Tres trabajos, los tres BLOQUEAN:
+#   lint   → shellcheck (bash) + ruff (python, solo reglas que encuentran bugs).
+#   tests  → pytest: contrato de cada guarda, corpus adversarial de evasiones y
+#            propiedades con Hypothesis. En Linux Y en Windows: la mayoría de
+#            quienes usan esto corren los hooks en Git Bash, y ahí es donde
+#            aparecen los bugs de rutas, CRLF y cygpath.
+
+name: tests
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: shellcheck
+        # -S warning: errores y advertencias bloquean; las notas de estilo no.
+        # -x: sigue los `source` (vault-conf.sh).
+        run: |
+          shellcheck --version | sed -n 2p
+          shellcheck -S warning -x \
+            .claude/hooks/*.sh .githooks/* \
+            install.sh update.sh personalize.sh \
+            baseline-seguridad/*.sh baseline-seguridad/pre-commit
+
+      - name: ruff
+        run: |
+          python -m pip install -q -r tests/requirements.txt
+          python -m ruff check --config tests/ruff.toml .claude baseline-seguridad tests
+
+  tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      # autocrlf apagado: en Windows el runner convertiría a CRLF lo que
+      # .gitattributes no cubra, y se estaría probando otro checkout.
+      - run: git config --global core.autocrlf false
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Dependencias de test
+        # Solo para correr los tests. Los hooks NO dependen de nada de esto:
+        # siguen siendo bash + python de la biblioteca estándar.
+        run: python -m pip install -q -r tests/requirements.txt
+
+      - name: pytest
+        env:
+          # Perfil de CI de Hypothesis: más ejemplos que en local, sin deadline
+          # (los runners de Windows son lentos lanzando procesos).
+          HYPOTHESIS_PROFILE: ci
+        run: python -m pytest tests -q -p no:cacheprovider

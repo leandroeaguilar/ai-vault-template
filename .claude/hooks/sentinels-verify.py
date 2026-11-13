@@ -15,17 +15,18 @@ Reparto deliberado de responsabilidades:
 
 Qué valida: para cada .md que cambió, toma los bloques
     <!-- @user --> ... <!-- /@user -->
-de la versión ANTERIOR y exige que su contenido siga presente, textual, en la
-versión nueva. Si un bloque se alteró o desapareció (incluso por borrar el
-archivo entero) → violación.
+de la versión ANTERIOR y exige que su contenido siga presente, textual Y DENTRO
+DE UN BLOQUE @user, en la versión nueva. Si un bloque se alteró, desapareció
+(incluso por borrar el archivo entero) o quedó sin marcadores → violación. Un
+archivo renombrado se compara contra su ruta anterior.
 
 Los marcadores que viven dentro de código —bloques ``` / ~~~ **y** spans inline
 entre backticks— se IGNORAN: las guías del vault documentan los centinelas con
 ejemplos, y sin esto darían falso positivo. No es teórico: un marcador de
 apertura suelto en un ejemplo inline (`<!--@user-->`, ilustrando que los espacios
 son flexibles) empareja con el primer cierre real que encuentre 24 líneas más
-abajo y crea una **región fantasma** que protege media nota. Es el bug que tenía
-—y tiene— el guard PreToolUse. (Mismo tipo de fix que ya llevaba check-contradictions.sh.)
+abajo y crea una **región fantasma** que protege media nota. La lógica vive en
+sentinels_common.py, compartida con el guard PreToolUse para que decidan igual.
 
 Modos (las reglas son idénticas en ambos):
   (por defecto)          → lo STAGED, contra HEAD. Modo del hook pre-commit.
@@ -38,14 +39,11 @@ FAIL-OPEN ante error inesperado (exit 0): un bug del verificador nunca debe
 frenar trabajo legítimo.
 """
 import os
-import re
 import subprocess
 import sys
 
-OPEN_RE = re.compile(r'<!--\s*@user\s*-->')
-CLOSE_RE = re.compile(r'<!--\s*/@user\s*-->')
-FENCE_RE = re.compile(r'^\s*(```|~~~)')
-INLINE_CODE_RE = re.compile(r'(`+)(?:(?!\1).)*\1')
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from sentinels_common import lost_regions, user_regions  # noqa: E402
 
 
 def git(*args):
@@ -71,51 +69,38 @@ def git(*args):
     return out.stdout.decode('utf-8', 'replace')
 
 
-def code_spans(text):
-    """Rangos [inicio, fin) de offsets que son código: fences y spans inline."""
-    spans = []
-    pos = 0
-    in_fence = False
-    start = 0
-    for line in text.splitlines(keepends=True):
-        if FENCE_RE.match(line):
-            if in_fence:
-                spans.append((start, pos + len(line)))
-                in_fence = False
-            else:
-                in_fence = True
-                start = pos
-        elif not in_fence:
-            # Código inline: `<!--@user-->` en una guía es un EJEMPLO, no un marcador.
-            for m in INLINE_CODE_RE.finditer(line):
-                spans.append((pos + m.start(), pos + m.end()))
-        pos += len(line)
-    if in_fence:              # fence sin cerrar: hasta el final
-        spans.append((start, pos))
-    return spans
+def changed_md(base, head):
+    """
+    [(ruta_vieja, ruta_nueva)] de los .md que cambiaron. ruta_nueva es None si
+    el archivo se borró; en un rename las dos rutas difieren.
 
-
-def user_regions(text):
-    """Contenido de cada bloque @user cerrado, ignorando los marcadores que son código."""
-    spans = code_spans(text)
-
-    def in_fence(i):
-        return any(a <= i < b for a, b in spans)
-
-    opens = [m.end() for m in OPEN_RE.finditer(text) if not in_fence(m.start())]
-    closes = [m.start() for m in CLOSE_RE.finditer(text) if not in_fence(m.start())]
-
-    regions = []
-    ci = 0
-    for o in opens:
-        # Primer cierre que esté después de esta apertura.
-        while ci < len(closes) and closes[ci] < o:
-            ci += 1
-        if ci >= len(closes):
-            break                    # apertura sin cierre: no es un bloque, se ignora
-        regions.append(text[o:closes[ci]])
-        ci += 1
-    return [r for r in regions if r.strip()]
+    Los renames se piden EXPLÍCITOS (-M, estado R): con un filtro ACMD, un
+    archivo renombrado y alterado en el mismo commit no aparecía ni por la ruta
+    vieja ni por la nueva, y el bloque @user se perdía sin que nadie lo viera.
+    """
+    args = ['diff', '--name-status', '-z', '-M', '--diff-filter=ACMDR']
+    args += ['%s...%s' % (base, head)] if base else ['--cached']
+    raw = git(*args)
+    if not raw:
+        return []
+    fields = raw.split(chr(0))
+    pairs, i = [], 0
+    while i < len(fields) and fields[i]:
+        status = fields[i][0]
+        if status in 'RC' and i + 2 < len(fields):
+            old, new = fields[i + 1], fields[i + 2]
+            i += 3
+            if status == 'C':
+                continue             # copia: el original sigue donde estaba
+        elif i + 1 < len(fields):
+            old = fields[i + 1]
+            new = None if status == 'D' else old
+            i += 2
+        else:
+            break
+        if old.endswith('.md'):
+            pairs.append((old, new))
+    return pairs
 
 
 def main():
@@ -137,38 +122,31 @@ def main():
             print('sentinels-verify: --range necesita <BASE> [HEAD]', file=sys.stderr)
             sys.exit(0)
 
-    if base:
-        names = git('diff', '--name-only', '--diff-filter=ACMD', '%s...%s' % (base, head))
-        old_ref, new_ref = base, head
-    else:
-        names = git('diff', '--cached', '--name-only', '--diff-filter=ACMD')
-        old_ref, new_ref = 'HEAD', None   # new_ref None => índice
+    old_ref = base if base else 'HEAD'
 
-    if not names:
-        sys.exit(0)
+    def show_new(path):
+        return git('show', '%s:%s' % (head, path)) if base else git('show', ':%s' % path)
 
     violations = []
-    for path in names.splitlines():
-        if not path.endswith('.md'):
-            continue
-
-        old = git('show', '%s:%s' % (old_ref, path))
+    for old_path, new_path in changed_md(base, head):
+        old = git('show', '%s:%s' % (old_ref, old_path))
         if not old:
             continue                 # archivo nuevo: no había nada protegido
-        regions = user_regions(old)
-        if not regions:
+        total = len([r for r in user_regions(old) if r.strip()])
+        if not total:
             continue
 
-        new = git('show', '%s:%s' % (new_ref, path)) if new_ref else git('show', ':%s' % path)
+        new = show_new(new_path) if new_path else None
         if new is None:
             # No existe del lado nuevo: el archivo se borró con contenido protegido dentro.
-            violations.append((path, 'el archivo se borra y contenía %d bloque(s) @user' % len(regions)))
+            violations.append((old_path, 'el archivo se borra y contenía %d bloque(s) @user' % total))
             continue
 
-        missing = sum(1 for r in regions if r not in new)
+        missing = len(lost_regions(old, new))
         if missing:
-            violations.append((path, '%d de %d bloque(s) @user alterados o eliminados'
-                               % (missing, len(regions))))
+            where = old_path if new_path == old_path else '%s -> %s' % (old_path, new_path)
+            violations.append((where, '%d de %d bloque(s) @user alterados, eliminados o desprotegidos'
+                               % (missing, total)))
 
     if not violations:
         print('sentinels-verify: OK (bloques @user intactos).')

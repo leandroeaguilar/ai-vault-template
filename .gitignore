@@ -18,5 +18,11 @@ credentials.json
 __pycache__/
 *.pyc
 
+# Cachés de las herramientas de test (tests/requirements.txt).
+.pytest_cache/
+.hypothesis/
+.ruff_cache/
+.venv/
+
 # Obsidian cache y estado local de UI
 .obsidian/

@@ -13,28 +13,21 @@ PY="$(command -v python3 || command -v python || true)"
 #
 #    vault.conf se PARSEA, no se sourcea: es un archivo versionado que con
 #    `source` ejecutaría shell en la máquina de cada persona en cada commit.
-#
 #    ⚠️ El mensaje no promete controles de servidor. Con plan Free y repo privado
 #    GitHub no puede exigir PR ni review, y `verify` es señal y no bloqueo: este
 #    gate local suele ser el ÚNICO control automático real.
-vault_conf() {   # $1=clave  $2=default
-  local v
-  v="$(sed -n "s/^[[:space:]]*$1[[:space:]]*=[[:space:]]*//p" vault.conf 2>/dev/null | head -1)"
-  v="${v%"${v##*[![:space:]]}"}"          # trim de espacios finales
-  v="${v#\"}"; v="${v%\"}"; v="${v#\'}"; v="${v%\'}"
-  [ -n "$v" ] && printf '%s' "$v" || printf '%s' "$2"
-}
-VAULT_MODE="$(vault_conf VAULT_MODE "")"
-if [ -z "$VAULT_MODE" ]; then
-  # Compat con instancias anteriores a vault.conf, que tenían el modo en
-  # owner.env. Ojo: owner.env está GITIGNOREADO, así que ahí el modo nunca
-  # llegaba al clon de las demás personas y el gate nacía inerte justo para
-  # quien tenía que frenarlo. Migrar a vault.conf (versionado).
-  VAULT_MODE="$(sed -n 's/^[[:space:]]*VAULT_MODE=//p' owner.env 2>/dev/null | tr -d "\"' " | head -1)"
+#    La lectura vive en .claude/hooks/vault-conf.sh, compartida con
+#    auto-commit.sh y pr-notice.sh para que los tres entiendan lo mismo.
+VAULT_MODE=personal; MAIN_BRANCH=main
+# shellcheck source=.claude/hooks/vault-conf.sh
+if . "$ROOT/.claude/hooks/vault-conf.sh" 2>/dev/null; then
+  VAULT_MODE="$(vault_mode)"
+  MAIN_BRANCH="$(vault_conf MAIN_BRANCH main)"
+else
+  echo "pre-commit: ⚠ falta .claude/hooks/vault-conf.sh — el gate de rama queda inerte." >&2
 fi
-MAIN_BRANCH="$(vault_conf MAIN_BRANCH main)"
 
-if [ "${VAULT_MODE:-personal}" = "equipo" ] && [ ! -f .vault-meta/branch-gate.disabled ]; then
+if [ "$VAULT_MODE" = "equipo" ] && [ ! -f .vault-meta/branch-gate.disabled ]; then
   BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")"
   if [ "$BRANCH" = "$MAIN_BRANCH" ]; then
     echo "🔴 pre-commit: este vault está en VAULT_MODE=equipo y estás sobre «$MAIN_BRANCH»." >&2
@@ -85,6 +78,9 @@ CTRL="$(git -C "$ROOT" -c core.quotepath=false diff --cached --name-only -- \
 if [ -n "$CTRL" ]; then
   echo "pre-commit: ⚠ este commit toca archivos de CONTROL o de ley — revisá que sea intencional:"
   printf '%s\n' "$CTRL" | sed 's/^/    /'
+  echo "    Un control roto no falla: deja pasar. Antes de confirmar, corré los tests"
+  echo "    (python -m pytest tests -q) y la revisión adversarial (agente revisor-adversarial"
+  echo "    o skill .agents/skills/revision-adversarial)."
 fi
 
 # 5) Verifier de conocimiento (frontmatter + tags).

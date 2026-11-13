@@ -1,0 +1,9 @@
+# Lint de los scripts del vault. Solo reglas que encuentran BUGS (errores de
+# sintaxis y pyflakes: nombres indefinidos, imports sin usar, variables muertas).
+# Estilo afuera a propósito: un linter que grita por comillas se aprende a ignorar.
+#
+#   ruff check --config tests/ruff.toml .claude baseline-seguridad tests
+target-version = "py38"
+
+[lint]
+select = ["E9", "F"]
