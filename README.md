@@ -265,7 +265,7 @@ python -m pytest tests -q
 |---|---|
 | Contrato de cada guarda | casos «bloquea» y «permite», ejecutando el script real |
 | Evasiones | corpus adversarial: cada evasión cerrada queda como test de regresión, y los límites conocidos de la guarda por regex quedan listados como tales |
-| Invariantes | propiedades con Hypothesis: regenerar índices o endurecer enlaces dos veces no cambia nada; editar fuera de un bloque `@user` nunca bloquea y editar dentro siempre |
+| Invariantes | propiedades con Hypothesis: editar fuera de un bloque `@user` nunca bloquea y editar dentro siempre; la guarda nunca revienta con una entrada arbitraria |
 | Coherencia | el kit de `baseline-seguridad/` no se desfasa del original; `settings.json` invoca scripts que existen |
 
 Los hooks siguen sin dependencias (bash y la biblioteca estándar de Python); lo de
