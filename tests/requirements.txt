@@ -1,0 +1,13 @@
+# Dependencias para CORRER LOS TESTS. Nada más.
+#
+# Los hooks del vault no dependen de esto: son bash + python de la biblioteca
+# estándar, y así tienen que seguir (corren en la máquina de cada persona, en
+# cada commit). Esto se instala en CI y, si querés, en un venv local:
+#
+#   python -m venv .venv && . .venv/bin/activate      # Windows: .venv/Scripts/activate
+#   python -m pip install -r tests/requirements.txt
+#   python -m pytest tests -q
+#   python -m ruff check --config tests/ruff.toml .claude baseline-seguridad tests
+pytest>=8
+hypothesis>=6.100
+ruff>=0.6

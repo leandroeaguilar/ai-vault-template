@@ -30,14 +30,18 @@ NAME_RE='(^|/)\.env(\.|$)|\.pem$|\.ppk$|\.p12$|\.pfx$|(^|/)id_rsa|(^|/)id_ed2551
 # Contenido con formato de clave/token conocido (bajo falso positivo).
 CONTENT_RE='-----BEGIN [A-Z ]*PRIVATE KEY-----|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{22,}|xox[baprs]-[A-Za-z0-9-]{10,}|AIza[0-9A-Za-z_\-]{35}|-----BEGIN OPENSSH PRIVATE KEY-----'
 
+# Filtro ACMR, con la R: un archivo RENOMBRADO y modificado en el mismo commit
+# sale como R(ename), no como M. Sin la R, `git mv a b` + pegar el secreto en b
+# pasaba sin escanearse (--name-only ya devuelve la ruta nueva).
+#
 # quotepath=false: sin esto git entrecomilla y escapa las rutas no-ASCII
 # ("contrase\361a.env"); el nombre escapado evade el chequeo por NAME_RE y
 # `git show ":$path"` no resuelve -> el CONTENIDO de un archivo con nombre/ruta
 # acentuada nunca se escanea. Agujero de seguridad, no cosmético.
 if [ -n "$RANGE_BASE" ]; then
-  staged="$(git -c core.quotepath=false diff --name-only --diff-filter=ACM "$RANGE_BASE...$RANGE_HEAD" 2>/dev/null || true)"
+  staged="$(git -c core.quotepath=false diff --name-only --diff-filter=ACMR "$RANGE_BASE...$RANGE_HEAD" 2>/dev/null || true)"
 else
-  staged="$(git -c core.quotepath=false diff --cached --name-only --diff-filter=ACM 2>/dev/null || true)"
+  staged="$(git -c core.quotepath=false diff --cached --name-only --diff-filter=ACMR 2>/dev/null || true)"
 fi
 [ -z "$staged" ] && exit 0
 
@@ -57,15 +61,28 @@ if [ -n "$name_hits" ]; then
   violations=$((violations+1))
 fi
 
-# 2) Por CONTENIDO staged (solo el diff agregado; ignora binarios y markdown-prosa).
+# 2) Por CONTENIDO staged (ignora binarios; en markdown solo claves privadas).
+# Una clave privada pegada entera: el encabezado va SOLO en su línea. En prosa
+# («una clave empieza con `-----BEGIN ...`») aparece a mitad de renglón y no matchea.
+MD_RE='^[[:space:]]*-----BEGIN [A-Z ]*PRIVATE KEY-----[[:space:]]*$'
 while IFS= read -r f; do
   [ -z "$f" ] && continue
-  # .md hablan de secretos; los propios scanners CONTIENEN los patrones a propósito.
-  case "$f" in *.md|*secret-scan.sh|*security-audit.sh|*security-guard.py) continue ;; esac
-  hit="$(blob "$f" | grep -nE -e "$CONTENT_RE" || true)"
+  re="$CONTENT_RE"
+  case "$f" in
+    # Los propios scanners CONTIENEN los patrones a propósito. Rutas EXACTAS:
+    # con un glob por nombre (*secret-scan.sh), llamar a un archivo
+    # `tools/mi-secret-scan.sh` alcanzaba para que nadie mirara su contenido.
+    .claude/hooks/secret-scan.sh|.claude/hooks/security-audit.sh|.claude/hooks/security-guard.py) continue ;;
+    baseline-seguridad/secret-scan.sh|baseline-seguridad/security-guard.py) continue ;;
+    # Los .md hablan de secretos (nombran prefijos de tokens): ahí solo se busca
+    # una clave privada completa, que no es prosa.
+    *.md) re="$MD_RE" ;;
+  esac
+  hit="$(blob "$f" | grep -nE -e "$re" || true)"
   if [ -n "$hit" ]; then
     echo "🔴 secret-scan: posible secreto en «$f»:" >&2
-    printf '%s\n' "$hit" | sed 's/^/   /' >&2
+    printf '%s
+' "$hit" | sed 's/^/   /' >&2
     violations=$((violations+1))
   fi
 done <<< "$staged"

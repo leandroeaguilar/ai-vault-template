@@ -19,18 +19,44 @@ cd "$ROOT" 2>/dev/null || exit 0
 INPUT="$(cat)"
 
 # --- extraer file_path del JSON (sin jq) ---
-FILE="$(printf '%s' "$INPUT" | sed -n 's/.*"file_path"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)"
+# Con python: un parser de JSON de verdad. Entiende los escapes \uXXXX (una ruta
+# con tilde puede llegar como "Decisión.md"), las comillas escapadas y un
+# "file_path" que aparezca además dentro del `content` de un Write.
+# Sin python: sed, que cubre el caso común (rutas en UTF-8 crudo).
+PY="$(command -v python3 2>/dev/null || command -v python 2>/dev/null || true)"
+FILE=""
+if [ -n "$PY" ]; then
+  FILE="$(printf '%s' "$INPUT" | "$PY" -c '
+import json, sys
+try:
+    d = json.loads(sys.stdin.buffer.read().decode("utf-8", "replace"))
+    fp = (d.get("tool_input") or {}).get("file_path") or ""
+    sys.stdout.buffer.write(str(fp).encode("utf-8"))
+except Exception:
+    pass
+' 2>/dev/null || true)"
+else
+  FILE="$(printf '%s' "$INPUT" | sed -n 's/.*"file_path"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)"
+  FILE="${FILE//\\\\/\\}"      # desescapar backslashes de JSON (\\ -> \)
+fi
 [ -z "$FILE" ] && exit 0
 
-# Desescapar backslashes de JSON (\\ -> \) y normalizar a ruta unix.
-FILE="${FILE//\\\\/\\}"
+# Normalizar a ruta unix.
 UNIXFILE="$(cygpath -u "$FILE" 2>/dev/null || printf '%s' "$FILE")"
 ROOTU="$(cygpath -u "$ROOT" 2>/dev/null || printf '%s' "$ROOT")"
 REL="${UNIXFILE#"$ROOTU"/}"
 
 # Solo contenido del vault (.md/.canvas); excluir config/estado/dispositivo o rutas no resueltas.
 case "$REL" in
-  .claude/*|.vault-meta/*|.obsidian/*|/*) exit 0 ;;
+  /*|[A-Za-z]:*)
+    # El archivo no cae bajo la raíz del vault (o cygpath tradujo raíz y archivo
+    # de forma distinta). No se commitea, pero queda dicho: antes salía en silencio.
+    case "$REL" in *.md|*.canvas)
+      mkdir -p .vault-meta 2>/dev/null && printf '%s auto-commit: ruta fuera de la raíz, no se commitea: %s (raíz: %s)
+'         "$(date '+%Y-%m-%dT%H:%M:%S' 2>/dev/null)" "$REL" "$ROOTU" >> .vault-meta/guard-errors.log 2>/dev/null ;;
+    esac
+    exit 0 ;;
+  .claude/*|.vault-meta/*|.obsidian/*) exit 0 ;;
   *.md|*.canvas) : ;;
   *) exit 0 ;;
 esac
@@ -49,11 +75,11 @@ mkdir -p .vault-meta 2>/dev/null || true
 # El modo vive en vault.conf, que está VERSIONADO y por lo tanto llega a todos
 # los clones. owner.env queda como fallback de compatibilidad: está gitignoreado,
 # así que ahí el modo nunca llegaba al clon de las demás personas.
-TEAM_MODE="$(sed -n 's/^[[:space:]]*VAULT_MODE=//p' vault.conf 2>/dev/null | tr -d "\"' " | head -1)"
-[ -n "$TEAM_MODE" ] || TEAM_MODE="$(sed -n 's/^[[:space:]]*VAULT_MODE=//p' owner.env 2>/dev/null | tr -d "\"' " | head -1)"
-if [ "${TEAM_MODE:-personal}" = "equipo" ]; then
+# La lectura vive en vault-conf.sh (la misma que usa el pre-commit).
+# shellcheck source=.claude/hooks/vault-conf.sh
+if . "$PWD/.claude/hooks/vault-conf.sh" 2>/dev/null && [ "$(vault_mode)" = "equipo" ]; then
   BRANCH="$(git symbolic-ref --short HEAD 2>/dev/null || printf '')"
-  case "$BRANCH" in main|master) exit 0 ;; esac
+  case "$BRANCH" in "$(vault_conf MAIN_BRANCH main)"|main|master) exit 0 ;; esac
 fi
 
 # Consciente de locks: si OTRO agente tiene un lock vigente sobre este archivo,
@@ -69,6 +95,22 @@ fi
 # Commit SOLO ese archivo, con identidad de agente.
 git add -- "$REL" 2>/dev/null || exit 0
 git diff --cached --quiet -- "$REL" 2>/dev/null && exit 0
-git -c user.name="Claude Code" -c user.email="claude@agent.local" \
-    commit -q -m "chore(agent): auto-commit $(basename "$REL")" -- "$REL" >/dev/null 2>&1 || true
+git -c user.name="Claude Code" -c user.email="claude@agent.local"     commit -q -m "chore(agent): auto-commit $(basename "$REL")" -- "$REL" >/dev/null 2>&1 || exit 0
+
+# Resincronizar el index.md de la carpeta. `git commit -- <ruta>` es un commit
+# PARCIAL: git arma un índice temporal, y lo que el pre-commit le agrega ahí (el
+# index.md regenerado) entra al commit pero NO vuelve al índice real. Resultado:
+# el índice real se queda con la versión VIEJA del index.md ya staged, y el
+# siguiente `git commit` manual la revierte (o borra el archivo, si era nuevo).
+# Como el index.md del disco es idéntico al de HEAD, re-stagearlo deja todo limpio.
+IDX="$(dirname "$REL")/index.md"; IDX="${IDX#./}"
+# Se compara por hash contra HEAD (y no con `git diff`, que mira el índice real,
+# justamente el que quedó desfasado): solo se re-stagea si disco == HEAD, o sea
+# si no hay nada del usuario que pisar.
+if [ -f "$IDX" ]; then
+  IN_HEAD="$(git rev-parse -q --verify "HEAD:$IDX" 2>/dev/null || true)"
+  if [ -n "$IN_HEAD" ] && [ "$(git hash-object -- "$IDX" 2>/dev/null)" = "$IN_HEAD" ]; then
+    git add -- "$IDX" 2>/dev/null || true
+  fi
+fi
 exit 0

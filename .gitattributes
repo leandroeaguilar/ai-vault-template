@@ -3,6 +3,10 @@
 *.sh text eol=lf
 .claude/hooks/* text eol=lf
 .githooks/* text eol=lf
+# El kit portable trae hooks SIN extensión .sh (pre-commit): sin esta línea salían
+# con CRLF en Windows y, copiados a otro proyecto, el shebang no arrancaba.
+baseline-seguridad/* text eol=lf
+tests/* text eol=lf
 
 # ── Archivos append-only: unión en vez de conflicto ──────────────────────────
 # `merge=union` conserva las líneas de AMBOS lados en lugar de marcar conflicto.

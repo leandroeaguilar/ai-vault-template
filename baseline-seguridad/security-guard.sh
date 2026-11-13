@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PreToolUse (Bash|Read) — guardián de seguridad (capa 2, determinista).
+# PreToolUse (Bash|Read|Write|Edit) — guardián de seguridad (capa 2, determinista).
 #
 # Wrapper delgado: chequea el kill-switch, ubica python y delega la lógica en
 # security-guard.py (parseo robusto del JSON de stdin). El .py decide exit 0
