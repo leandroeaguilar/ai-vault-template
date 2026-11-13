@@ -244,6 +244,33 @@ Claude Code, OpenCode) y humanos.
 | `verify-commit.sh` | `git commit` + CI | todos | `verifier.disabled` |
 | `.githooks/pre-push` | `git push` | todos | `prepush.disabled` |
 | `verify.yml` · `aviso-de-pr.yml` | Pull Request | todos | desactivar el workflow |
+| `revision-adversarial` (`.agents/skills/`) | antes de `git commit`, si toca hooks o CI | todos | — |
+| `tests.yml` | Pull Request + push a la rama principal | todos | desactivar el workflow |
+
+Los kill-switch los crea una persona: `security-guard` bloquea que un agente cree un
+`.vault-meta/*.disabled`, cambie `core.hooksPath` o commitee con `--no-verify`.
+
+### Tests de las guardas
+
+Casi todos los hooks son *fail-open*: ante un error, permiten. Una guarda rota no falla,
+deja pasar. Por eso las guardas tienen su propia suite en `tests/`, que corre contra un
+repo descartable y nunca toca tu vault:
+
+```bash
+python -m pip install -r tests/requirements.txt   # pytest, hypothesis, ruff — solo para testear
+python -m pytest tests -q
+```
+
+| Qué prueba | Cómo |
+|---|---|
+| Contrato de cada guarda | casos «bloquea» y «permite», ejecutando el script real |
+| Evasiones | corpus adversarial: cada evasión cerrada queda como test de regresión, y los límites conocidos de la guarda por regex quedan listados como tales |
+| Invariantes | propiedades con Hypothesis: regenerar índices o endurecer enlaces dos veces no cambia nada; editar fuera de un bloque `@user` nunca bloquea y editar dentro siempre |
+| Coherencia | el kit de `baseline-seguridad/` no se desfasa del original; `settings.json` invoca scripts que existen |
+
+Los hooks siguen sin dependencias (bash y la biblioteca estándar de Python); lo de
+`tests/requirements.txt` solo hace falta para correr los tests. Si un fail-open se dispara,
+el motivo queda en `.vault-meta/guard-errors.log`.
 
 ---
 
