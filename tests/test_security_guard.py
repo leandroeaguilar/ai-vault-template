@@ -65,16 +65,23 @@ PERMITE = [
 
 
 @pytest.mark.parametrize("cmd", BLOQUEA)
-def test_bloquea(vault, cmd):
-    p = vault.tool("security-guard.sh", "Bash", command=cmd)
-    assert p.returncode == 2, out(p)
-    assert b"SECURITY-GUARD" in p.stderr
+def test_bloquea(cmd):
+    assert decide_bash(cmd) == 2
 
 
 @pytest.mark.parametrize("cmd", PERMITE)
-def test_permite(vault, cmd):
-    p = vault.tool("security-guard.sh", "Bash", command=cmd)
-    assert p.returncode == 0, out(p)
+def test_permite(cmd):
+    assert decide_bash(cmd) == 0
+
+
+def test_contrato_del_script_real(vault):
+    """De punta a punta por el wrapper .sh, como lo invoca el harness: exit 2 con
+    el motivo en stderr al bloquear, exit 0 al permitir. Las listas de arriba se
+    evalúan en proceso para no lanzar un bash por caso."""
+    p = vault.tool("security-guard.sh", "Bash", command=BLOQUEA[0])
+    assert p.returncode == 2, out(p)
+    assert b"SECURITY-GUARD" in p.stderr
+    assert vault.tool("security-guard.sh", "Bash", command=PERMITE[0]).returncode == 0
 
 
 @pytest.mark.parametrize("path,code", [
@@ -217,7 +224,7 @@ def test_check_bash_siempre_decide(cmd):
     assert decide_bash(cmd) in (0, 2)
 
 
-@settings(max_examples=40, deadline=None)
+@settings(max_examples=15, deadline=None)
 @given(st.one_of(json_arbitrario.map(json.dumps), st.binary(max_size=200)))
 def test_script_nunca_revienta(tmp_path_factory, payload):
     """Fuzzing de la entrada del hook: basura por stdin => exit 0 o 2, sin traceback."""

@@ -14,7 +14,7 @@ contra el del upstream para decidir si una instancia está atrasada — por eso 
 Las guardas ahora tienen tests, y los tests encontraron evasiones.
 
 ### Agregado
-- **Suite de tests de las guardas (`tests/`)**: contrato de cada hook, corpus adversarial de evasiones y propiedades con Hypothesis, contra un repo descartable. Workflow `tests.yml` (shellcheck + ruff + pytest en Linux y Windows), también en push a la rama principal.
+- **Suite de tests de las guardas (`tests/`)**: contrato de cada hook, corpus adversarial de evasiones y propiedades con Hypothesis, contra un repo descartable. Workflow `tests.yml` (shellcheck + ruff + pytest), también en push a la rama principal.
 - **Revisión adversarial**: agente `revisor-adversarial` y skill `.agents/skills/revision-adversarial/` para atacar un cambio que toca controles antes de commitearlo. El pre-commit lo recuerda cuando corresponde.
 - **`.vault-meta/guard-errors.log`**: cuando una guarda cae en fail-open deja el motivo. Antes salía en silencio.
 - `security-guard` bloquea que un agente apague los controles: crear un `.vault-meta/*.disabled` (también por `Write`/`Edit`), cambiar `core.hooksPath` o usar `--no-verify`.

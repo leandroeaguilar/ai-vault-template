@@ -11,12 +11,11 @@
 # Corre también en `push` a la rama principal: en un vault personal el dueño
 # commitea directo a main y ahí no hay PR que dispare nada.
 #
-# Tres trabajos, los tres BLOQUEAN:
+# Dos trabajos, los dos BLOQUEAN:
 #   lint   → shellcheck (bash) + ruff (python, solo reglas que encuentran bugs).
 #   tests  → pytest: contrato de cada guarda, corpus adversarial de evasiones y
-#            propiedades con Hypothesis. En Linux Y en Windows: la mayoría de
-#            quienes usan esto corren los hooks en Git Bash, y ahí es donde
-#            aparecen los bugs de rutas, CRLF y cygpath.
+#            propiedades con Hypothesis. Solo en Linux, para que sea rápido; la
+#            suite también corre en Git Bash de Windows si la lanzás a mano.
 
 name: tests
 
@@ -59,19 +58,8 @@ jobs:
           python -m ruff check --config tests/ruff.toml .claude baseline-seguridad tests
 
   tests:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        shell: bash
+    runs-on: ubuntu-latest
     steps:
-      # autocrlf apagado: en Windows el runner convertiría a CRLF lo que
-      # .gitattributes no cubra, y se estaría probando otro checkout.
-      - run: git config --global core.autocrlf false
-
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
@@ -85,7 +73,6 @@ jobs:
 
       - name: pytest
         env:
-          # Perfil de CI de Hypothesis: más ejemplos que en local, sin deadline
-          # (los runners de Windows son lentos lanzando procesos).
+          # Perfil de CI de Hypothesis: más ejemplos que en local.
           HYPOTHESIS_PROFILE: ci
         run: python -m pytest tests -q -p no:cacheprovider

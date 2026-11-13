@@ -178,9 +178,19 @@ Cuerpo.
 """
 
 
+@pytest.fixture(scope="session")
+def _vault_molde(tmp_path_factory):
+    """Un vault armado UNA vez por corrida. Cada test recibe una copia."""
+    return build_vault(tmp_path_factory.mktemp("molde") / "vault").root
+
+
 @pytest.fixture
-def vault(tmp_path):
-    return build_vault(tmp_path / "vault")
+def vault(tmp_path, _vault_molde):
+    # Copiar el directorio (con su .git) evita init + config + add + commit por
+    # test: ocho procesos git menos en cada uno, que en Windows es casi todo el costo.
+    destino = tmp_path / "vault"
+    shutil.copytree(_vault_molde, destino)
+    return Vault(destino)
 
 
 @pytest.fixture

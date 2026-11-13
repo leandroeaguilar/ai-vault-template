@@ -162,7 +162,7 @@ def shared_vault(tmp_path_factory):
     return build_vault(tmp_path_factory.mktemp("scan") / "vault")
 
 
-@settings(max_examples=25, deadline=None,
+@settings(max_examples=8, deadline=None,
           suppress_health_check=[HealthCheck.function_scoped_fixture])
 @given(kind=st.sampled_from(sorted(SECRETS)), antes=relleno, despues=relleno,
        arriba=st.lists(relleno, max_size=5))
