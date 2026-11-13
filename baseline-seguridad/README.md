@@ -7,7 +7,7 @@
 | Archivo | Copiar a | Capa | Qué hace |
 |---|---|---|---|
 | `settings.json` | `.claude/settings.json` (fusionar) | 1 Permisos | Bloque `deny` (red por shell, `git push --force`, leer secretos, salir del proyecto) + `ask` en push + wiring del guard |
-| `security-guard.sh` + `security-guard.py` | `.claude/hooks/` | 2 Prevención | `PreToolUse Bash\|Read`: bloquea salida de red, lectura de secretos, force-push, escritura por shell a config. Escanea el comando entero |
+| `security-guard.sh` + `security-guard.py` | `.claude/hooks/` | 2 Prevención | `PreToolUse Bash\|Read\|Write\|Edit`: bloquea salida de red, lectura de secretos, force-push, escritura por shell a config y que el agente apague los controles (kill-switch, `core.hooksPath`, `--no-verify`). Escanea el comando entero |
 | `secret-scan.sh` | `.claude/hooks/` | 3 Gate commit | Bloquea el commit si hay un secreto staged (antes del historial) |
 | `pre-commit` | `.githooks/pre-commit` | 3 Gate commit | Dispara `secret-scan.sh` en cada commit |
 | `gitignore-secretos.txt` | pegar en `.gitignore` | 1 Base | Ignora `.env*`, claves, credenciales, `__pycache__` |
