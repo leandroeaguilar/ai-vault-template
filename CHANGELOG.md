@@ -9,6 +9,30 @@ contra el del upstream para decidir si una instancia está atrasada — por eso 
 
 ---
 
+## [Sin publicar]
+
+Las guardas ahora tienen tests, y los tests encontraron evasiones.
+
+### Agregado
+- **Suite de tests de las guardas (`tests/`)**: contrato de cada hook, corpus adversarial de evasiones y propiedades con Hypothesis, contra un repo descartable. Workflow `tests.yml` (shellcheck + ruff + pytest en Linux y Windows), también en push a la rama principal.
+- **Revisión adversarial**: agente `revisor-adversarial` y skill `.agents/skills/revision-adversarial/` para atacar un cambio que toca controles antes de commitearlo. El pre-commit lo recuerda cuando corresponde.
+- **`.vault-meta/guard-errors.log`**: cuando una guarda cae en fail-open deja el motivo. Antes salía en silencio.
+- `security-guard` bloquea que un agente apague los controles: crear un `.vault-meta/*.disabled` (también por `Write`/`Edit`), cambiar `core.hooksPath` o usar `--no-verify`.
+
+### Corregido
+- **`auto-commit.sh` dejaba el `index.md` de la carpeta desfasado en el staging**: el siguiente `git commit` manual lo revertía, o lo borraba si era nuevo. También ignoraba rutas con tilde cuando llegaban escapadas (`ó`).
+- **Evasiones por renombrado**: un archivo renombrado y modificado en el mismo commit no pasaba por `secret-scan`, `sentinels-verify` ni `verify-commit`.
+- **Centinelas `@user`**: un `Edit` que abarcaba el bloque entero o cruzaba su borde no se bloqueaba; quitar los marcadores dejando el texto tampoco. Guard y verificador comparten ahora la misma lógica (`sentinels_common.py`).
+- **`secret-scan`**: cualquier archivo llamado `*secret-scan.sh` quedaba exento del escaneo de contenido (ahora son rutas exactas); una clave privada pegada en un `.md` no se detectaba.
+- **`security-guard`**: `cat .env .env.example` pasaba por el sufijo de ejemplo; `git push origin +main`, `source .env` y pisar un hook con `cp`/`mv`/`sed -i`/`rm` no se atajaban; `git push origin main && git log -f` daba falso positivo.
+- **`verify-commit.sh`** salteaba en silencio las notas en carpetas con tilde y no avisaba la falta de `title` (el SOP lo declara warn-only).
+- **`VAULT_MODE = equipo`** (con espacios) activaba el gate de rama pero no frenaba el auto-commit en `main`: tres hooks parseaban `vault.conf` distinto. Ahora leen de `vault-conf.sh`.
+- `baseline-seguridad/pre-commit` salía con CRLF en Windows; `mapa-agentes.py` no parseaba en Python 3.10/3.11 pese a declararlo.
+
+### Cambiado
+- La plantilla HTML del mapa salió de `mapa-agentes.py` a `mapa-agentes.plantilla.html` (el script pasó de 3.040 a 1.441 líneas; el HTML generado es idéntico). Los dos archivos tienen que viajar juntos.
+- El hook `PreToolUse` de `security-guard` pasa de `Bash|Read` a `Bash|Read|Write|Edit`. Si fusionaste `settings.json` a mano, actualizá el matcher.
+
 ## [0.8.0] — 2026-10-10
 
 Rutinas a la vista en el mapa y una columna para lo que espera tu revisión.
