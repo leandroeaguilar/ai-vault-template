@@ -227,7 +227,7 @@ Claude Code, OpenCode) y humanos.
 | `pr-notice.sh` | inicio de sesión | CC | `pr-notice.disabled` |
 | `pre-compact.sh` | antes de compactar contexto | CC | `precompact.disabled` |
 | `sentinels-guard.sh` + `.py` | antes de `Write`/`Edit` | CC | `sentinels.disabled` |
-| `security-guard.sh` + `.py` | antes de `Bash`/`Read` | CC | `security-guard.disabled` |
+| `security-guard.sh` + `.py` | antes de `Bash`/`Read`/`Write`/`Edit` | CC | `security-guard.disabled` |
 | `auto-commit.sh` | después de `Write`/`Edit` | CC | `autocommit.disabled` |
 | `agent-diary.sh` | cierre de sesión (`Stop`) | CC | `diary.disabled` |
 | `check-diary-size.sh` | lo llama `agent-diary.sh` | CC | `diary-cap.disabled` |
